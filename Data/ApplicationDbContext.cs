@@ -21,27 +21,23 @@ namespace ProjectOrderNumberSystem.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            // プロジェクト番号にユニーク制約
+            // プロジェクト番号にユニーク制約（既存DBに存在する想定）
             modelBuilder.Entity<Project>()
                 .HasIndex(p => p.ProjectNumber)
                 .IsUnique();
 
-            // 社員番号にユニーク制約
+            // 社員番号にユニーク制約（既存DBに存在する想定）
             modelBuilder.Entity<Employee>()
                 .HasIndex(e => e.EmployeeId)
                 .IsUnique();
 
             // 編集履歴との関連付け（カスケード削除）
+            // 既存DBのリレーションシップを尊重
             modelBuilder.Entity<Project>()
                 .HasMany(p => p.EditHistory)
                 .WithOne(e => e.Project)
                 .HasForeignKey(e => e.ProjectId)
                 .OnDelete(DeleteBehavior.Cascade);
-
-            // UpdatedAtの自動更新設定
-            modelBuilder.Entity<Project>()
-                .Property(p => p.UpdatedAt)
-                .ValueGeneratedOnAddOrUpdate();
         }
     }
 }
