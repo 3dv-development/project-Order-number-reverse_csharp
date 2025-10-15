@@ -16,7 +16,8 @@ WORKDIR /app
 COPY --from=build /app/out .
 
 # Render uses PORT environment variable
-ENV ASPNETCORE_URLS=http://+:${PORT:-10000}
-EXPOSE ${PORT:-10000}
+# Set a startup script to handle PORT variable
+EXPOSE 10000
 
-ENTRYPOINT ["dotnet", "ProjectOrderNumberSystem.dll"]
+# Use shell form to allow environment variable expansion
+CMD ASPNETCORE_URLS=http://0.0.0.0:${PORT:-10000} dotnet ProjectOrderNumberSystem.dll
