@@ -10,18 +10,18 @@ namespace ProjectOrderNumberSystem.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly IProjectService _projectService;
-        private readonly IEmailService _emailService;
+        // private readonly IEmailService _emailService; // メール機能は一時無効化
         private readonly IBoardApiService _boardApiService;
 
         public ProjectController(
             ApplicationDbContext context,
             IProjectService projectService,
-            IEmailService emailService,
+            // IEmailService emailService, // メール機能は一時無効化
             IBoardApiService boardApiService)
         {
             _context = context;
             _projectService = projectService;
-            _emailService = emailService;
+            // _emailService = emailService; // メール機能は一時無効化
             _boardApiService = boardApiService;
         }
 
@@ -78,8 +78,8 @@ namespace ProjectOrderNumberSystem.Controllers
                     employeeName ?? "Unknown"
                 );
 
-                // メール送信
-                await _emailService.SendNotificationEmailAsync(createdProject);
+                // メール送信（一時的に無効化）
+                // await _emailService.SendNotificationEmailAsync(createdProject);
 
                 // Board連携: 案件Noがある場合、受注番号をboardに登録
                 if (!string.IsNullOrEmpty(project.CaseNumber))

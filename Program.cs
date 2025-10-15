@@ -35,7 +35,8 @@ builder.Services.AddHttpClient();
 
 // カスタムサービスの登録
 builder.Services.AddScoped<IProjectService, ProjectService>();
-builder.Services.AddScoped<IEmailService, EmailService>();
+// メール機能は一時的に無効化（設定未確定のため）
+// builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IBoardApiService, BoardApiService>();
 
 var app = builder.Build();
