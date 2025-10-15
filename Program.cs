@@ -42,6 +42,8 @@ builder.Services.AddScoped<IBoardApiService, BoardApiService>();
 var app = builder.Build();
 
 // データベース初期化（自動マイグレーション）
+// 本番環境では一旦無効化（既存のPython版DBを使用するため）
+/*
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
@@ -60,6 +62,7 @@ using (var scope = app.Services.CreateScope())
         logger.LogError(ex, "データベース初期化中にエラーが発生しました");
     }
 }
+*/
 
 // HTTPリクエストパイプラインの設定
 if (!app.Environment.IsDevelopment())
