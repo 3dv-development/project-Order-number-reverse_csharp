@@ -54,28 +54,43 @@ builder.Services.AddScoped<IBoardApiService, BoardApiService>();
 
 var app = builder.Build();
 
-// データベース初期化（自動マイグレーション）
-// 本番環境では一旦無効化（既存のPython版DBを使用するため）
-/*
+// データベース接続テスト（起動時）
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     try
     {
         var context = services.GetRequiredService<ApplicationDbContext>();
-        // 本番環境では手動でマイグレーションを推奨
-        if (app.Environment.IsDevelopment())
+        var canConnect = await context.Database.CanConnectAsync();
+
+        if (canConnect)
         {
-            context.Database.Migrate();
+            Console.WriteLine("[INFO] Database connection successful");
+
+            // テーブル存在確認
+            try
+            {
+                var employeeCount = await context.Employees.CountAsync();
+                var projectCount = await context.Projects.CountAsync();
+                Console.WriteLine($"[INFO] Found {employeeCount} employees and {projectCount} projects");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[WARNING] Could not query tables: {ex.Message}");
+            }
+        }
+        else
+        {
+            Console.WriteLine("[ERROR] Database connection failed at startup");
         }
     }
     catch (Exception ex)
     {
         var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "データベース初期化中にエラーが発生しました");
+        logger.LogError(ex, "データベース接続テスト中にエラーが発生しました");
+        Console.WriteLine($"[ERROR] Database test exception: {ex.Message}");
     }
 }
-*/
 
 // HTTPリクエストパイプラインの設定
 if (!app.Environment.IsDevelopment())

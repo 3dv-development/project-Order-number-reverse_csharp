@@ -23,29 +23,53 @@ namespace ProjectOrderNumberSystem.Controllers
         [HttpPost]
         public async Task<IActionResult> Login(string employeeId, string password)
         {
-            var employee = await _context.Employees
-                .FirstOrDefaultAsync(e => e.EmployeeId == employeeId);
-
-            if (employee == null)
+            try
             {
-                TempData["Error"] = "社員番号が見つかりません。新規アカウント作成をしてください。";
-                return View();
+                // データベース接続テスト
+                var canConnect = await _context.Database.CanConnectAsync();
+                if (!canConnect)
+                {
+                    TempData["Error"] = "データベースに接続できません";
+                    Console.WriteLine("[ERROR] Database connection failed");
+                    return View();
+                }
+
+                Console.WriteLine($"[INFO] Login attempt for employee: {employeeId}");
+
+                var employee = await _context.Employees
+                    .FirstOrDefaultAsync(e => e.EmployeeId == employeeId);
+
+                if (employee == null)
+                {
+                    Console.WriteLine($"[WARNING] Employee not found: {employeeId}");
+                    TempData["Error"] = "社員番号が見つかりません。新規アカウント作成をしてください。";
+                    return View();
+                }
+
+                // 簡易認証: 社員番号=パスワード
+                if (employeeId == password)
+                {
+                    // セッションに保存
+                    HttpContext.Session.SetString("EmployeeId", employee.EmployeeId);
+                    HttpContext.Session.SetString("EmployeeName", employee.Name);
+                    HttpContext.Session.SetString("Role", employee.Role);
+
+                    Console.WriteLine($"[INFO] Login successful: {employeeId}");
+                    TempData["Success"] = "ログインしました";
+                    return RedirectToAction("Index", "Home");
+                }
+                else
+                {
+                    Console.WriteLine($"[WARNING] Password mismatch for: {employeeId}");
+                    TempData["Error"] = "パスワードが正しくありません";
+                    return View();
+                }
             }
-
-            // 簡易認証: 社員番号=パスワード
-            if (employeeId == password)
+            catch (Exception ex)
             {
-                // セッションに保存
-                HttpContext.Session.SetString("EmployeeId", employee.EmployeeId);
-                HttpContext.Session.SetString("EmployeeName", employee.Name);
-                HttpContext.Session.SetString("Role", employee.Role);
-
-                TempData["Success"] = "ログインしました";
-                return RedirectToAction("Index", "Home");
-            }
-            else
-            {
-                TempData["Error"] = "パスワードが正しくありません";
+                Console.WriteLine($"[ERROR] Login exception: {ex.Message}");
+                Console.WriteLine($"[ERROR] Stack trace: {ex.StackTrace}");
+                TempData["Error"] = $"ログイン中にエラーが発生しました: {ex.Message}";
                 return View();
             }
         }
