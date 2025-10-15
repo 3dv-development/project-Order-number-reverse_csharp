@@ -11,7 +11,14 @@ var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL")
 // RenderのPostgreSQL URLをEF Core形式に変換
 if (connectionString != null && connectionString.StartsWith("postgres://"))
 {
+    var originalUrl = connectionString;
     connectionString = ConvertPostgresUrl(connectionString);
+    var uri = new Uri(originalUrl);
+    Console.WriteLine($"[INFO] Converted PostgreSQL connection string - Host: {uri.Host}");
+}
+else
+{
+    Console.WriteLine("[WARNING] DATABASE_URL not found or not in postgres:// format");
 }
 
 // サービスの登録
@@ -19,7 +26,11 @@ builder.Services.AddControllersWithViews();
 
 // データベースコンテキストの登録
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(connectionString));
+{
+    options.UseNpgsql(connectionString);
+    options.EnableSensitiveDataLogging(builder.Environment.IsDevelopment());
+    options.EnableDetailedErrors();
+});
 
 // セッション設定
 builder.Services.AddDistributedMemoryCache();
@@ -28,6 +39,8 @@ builder.Services.AddSession(options =>
     options.IdleTimeout = TimeSpan.FromHours(8);
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.None; // Render環境用
+    options.Cookie.SameSite = SameSiteMode.Lax;
 });
 
 // HttpClientの登録（Board API用）

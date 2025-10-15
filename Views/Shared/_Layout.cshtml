@@ -17,7 +17,20 @@
                 </button>
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav me-auto">
-                        @if (Context.Session.GetString("EmployeeId") != null)
+                        @{
+                            var employeeId = string.Empty;
+                            var employeeName = string.Empty;
+                            try
+                            {
+                                employeeId = Context.Session.GetString("EmployeeId") ?? string.Empty;
+                                employeeName = Context.Session.GetString("EmployeeName") ?? string.Empty;
+                            }
+                            catch
+                            {
+                                // セッションが利用できない場合は無視
+                            }
+                        }
+                        @if (!string.IsNullOrEmpty(employeeId))
                         {
                             <li class="nav-item">
                                 <a class="nav-link" href="/">ホーム</a>
@@ -31,11 +44,11 @@
                         }
                     </ul>
                     <ul class="navbar-nav">
-                        @if (Context.Session.GetString("EmployeeId") != null)
+                        @if (!string.IsNullOrEmpty(employeeId))
                         {
                             <li class="nav-item">
                                 <span class="navbar-text text-white me-3">
-                                    @Context.Session.GetString("EmployeeName") (@Context.Session.GetString("EmployeeId"))
+                                    @employeeName (@employeeId)
                                 </span>
                             </li>
                             <li class="nav-item">
