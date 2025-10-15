@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: project-order-number-csharp
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: DATABASE_URL
+        sync: false
+      - key: BoardApi__ApiKey
+        sync: false
+      - key: BoardApi__ApiToken
+        sync: false
+      - key: Email__NotificationEmail
+        value: 3dvall@3dv.co.jp
