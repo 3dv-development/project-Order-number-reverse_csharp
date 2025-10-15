@@ -220,4 +220,4 @@ dotnet build
 ---
 
 **作成日**: 2025年10月15日
-**バージョン**: 1.0.0 (C# Edition)
+**バージョン**: 1.0.1 (C# Edition - Dockerized)
