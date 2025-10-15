@@ -60,6 +60,7 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
     try
     {
+        Console.WriteLine("[INFO] Testing database connection...");
         var context = services.GetRequiredService<ApplicationDbContext>();
         var canConnect = await context.Database.CanConnectAsync();
 
@@ -77,11 +78,12 @@ using (var scope = app.Services.CreateScope())
             catch (Exception ex)
             {
                 Console.WriteLine($"[WARNING] Could not query tables: {ex.Message}");
+                Console.WriteLine($"[WARNING] Inner exception: {ex.InnerException?.Message}");
             }
         }
         else
         {
-            Console.WriteLine("[ERROR] Database connection failed at startup");
+            Console.WriteLine("[ERROR] Database connection failed at startup - CanConnectAsync returned false");
         }
     }
     catch (Exception ex)
@@ -89,6 +91,12 @@ using (var scope = app.Services.CreateScope())
         var logger = services.GetRequiredService<ILogger<Program>>();
         logger.LogError(ex, "データベース接続テスト中にエラーが発生しました");
         Console.WriteLine($"[ERROR] Database test exception: {ex.Message}");
+        Console.WriteLine($"[ERROR] Exception type: {ex.GetType().Name}");
+        if (ex.InnerException != null)
+        {
+            Console.WriteLine($"[ERROR] Inner exception: {ex.InnerException.Message}");
+            Console.WriteLine($"[ERROR] Inner exception type: {ex.InnerException.GetType().Name}");
+        }
     }
 }
 
@@ -117,13 +125,23 @@ app.Run();
 // PostgreSQL URL変換関数
 static string ConvertPostgresUrl(string postgresUrl)
 {
-    var uri = new Uri(postgresUrl);
-    var userInfo = uri.UserInfo.Split(':');
-    var username = userInfo[0];
-    var password = userInfo.Length > 1 ? userInfo[1] : "";
-    var host = uri.Host;
-    var port = uri.Port > 0 ? uri.Port : 5432;
-    var database = uri.AbsolutePath.TrimStart('/');
+    try
+    {
+        var uri = new Uri(postgresUrl);
+        var userInfo = uri.UserInfo.Split(':');
+        var username = userInfo[0];
+        var password = userInfo.Length > 1 ? userInfo[1] : "";
+        var host = uri.Host;
+        var port = uri.Port > 0 ? uri.Port : 5432;
+        var database = uri.AbsolutePath.TrimStart('/');
 
-    return $"Host={host};Port={port};Database={database};Username={username};Password={password};SSL Mode=Require;Trust Server Certificate=true";
+        Console.WriteLine($"[DEBUG] Converting connection - Host: {host}, Port: {port}, Database: {database}, User: {username}");
+
+        return $"Host={host};Port={port};Database={database};Username={username};Password={password};SSL Mode=Require;Trust Server Certificate=true";
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"[ERROR] Failed to convert PostgreSQL URL: {ex.Message}");
+        throw;
+    }
 }
