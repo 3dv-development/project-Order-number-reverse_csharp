@@ -1,0 +1,115 @@
+@{
+    ViewData["Title"] = "受注番号採番";
+    var employees = ViewData["Employees"] as List<ProjectOrderNumberSystem.Models.Employee>;
+}
+
+<h2>受注番号採番</h2>
+
+<form id="createForm">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label for="category" class="form-label">カテゴリ <span class="text-danger">*</span></label>
+                <select class="form-select" id="category" name="category" required>
+                    <option value="">選択してください</option>
+                    <option value="02">02 - 設計</option>
+                    <option value="03">03 - トレーニング・たよれーる・データ販売</option>
+                    <option value="04">04 - 製品販売</option>
+                    <option value="06">06 - システム受託</option>
+                    <option value="07">07 - システム小規模開発</option>
+                    <option value="08">08 - 付帯業務</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="caseNumber" class="form-label">案件No</label>
+                <input type="text" class="form-control" id="caseNumber" name="caseNumber" />
+                <small class="form-text text-muted">オプション</small>
+            </div>
+
+            <div class="mb-3">
+                <label for="projectName" class="form-label">案件名 <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="projectName" name="projectName" required />
+            </div>
+
+            <div class="mb-3">
+                <label for="clientName" class="form-label">客先名 <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="clientName" name="clientName" required />
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label for="staffId" class="form-label">担当者 <span class="text-danger">*</span></label>
+                <select class="form-select" id="staffId" name="staffId" required>
+                    <option value="">選択してください</option>
+                    @if (employees != null)
+                    {
+                        foreach (var emp in employees)
+                        {
+                            <option value="@emp.EmployeeId">@emp.Name (@emp.EmployeeId)</option>
+                        }
+                    }
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="budget" class="form-label">費用（円） <span class="text-danger">*</span></label>
+                <input type="number" class="form-control" id="budget" name="budget" value="0" required />
+            </div>
+
+            <div class="mb-3">
+                <label for="deadline" class="form-label">納期 <span class="text-danger">*</span></label>
+                <input type="date" class="form-control" id="deadline" name="deadline" required />
+            </div>
+
+            <div class="mb-3">
+                <label for="remarks" class="form-label">備考</label>
+                <textarea class="form-control" id="remarks" name="remarks" rows="3"></textarea>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <button type="submit" class="btn btn-primary btn-lg">採番実行</button>
+        <a href="/" class="btn btn-secondary btn-lg">キャンセル</a>
+    </div>
+</form>
+
+@section Scripts {
+<script>
+document.getElementById('createForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const formData = {
+        category: document.getElementById('category').value,
+        caseNumber: document.getElementById('caseNumber').value,
+        projectName: document.getElementById('projectName').value,
+        clientName: document.getElementById('clientName').value,
+        staffId: document.getElementById('staffId').value,
+        budget: parseInt(document.getElementById('budget').value),
+        deadline: document.getElementById('deadline').value,
+        remarks: document.getElementById('remarks').value
+    };
+
+    try {
+        const response = await fetch('/Project/Create', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formData)
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            alert(result.message);
+            window.location.href = '/';
+        } else {
+            alert('エラー: ' + result.error);
+        }
+    } catch (error) {
+        alert('エラーが発生しました: ' + error.message);
+    }
+});
+</script>
+}

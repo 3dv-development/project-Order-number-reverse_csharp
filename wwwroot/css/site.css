@@ -1,0 +1,48 @@
+/* 共通スタイル */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.footer {
+    position: relative;
+    bottom: 0;
+    width: 100%;
+    white-space: nowrap;
+    line-height: 60px;
+}
+
+/* フォームスタイル */
+.form-label {
+    font-weight: 600;
+}
+
+.text-danger {
+    color: #dc3545;
+}
+
+/* カードスタイル */
+.card {
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: box-shadow 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+/* テーブルスタイル */
+.table-hover tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+/* アラートスタイル */
+.alert {
+    border-radius: 6px;
+}
+
+/* ボタンスタイル */
+.btn {
+    border-radius: 6px;
+    font-weight: 500;
+}

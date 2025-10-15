@@ -1,0 +1,30 @@
+@{
+    ViewData["Title"] = "ログイン";
+}
+
+<div class="row justify-content-center mt-5">
+    <div class="col-md-6 col-lg-4">
+        <div class="card shadow">
+            <div class="card-body">
+                <h3 class="card-title text-center mb-4">受注番号採番システム</h3>
+                <h5 class="text-center mb-4">ログイン</h5>
+
+                <form method="post" asp-action="Login">
+                    <div class="mb-3">
+                        <label for="employeeId" class="form-label">社員番号</label>
+                        <input type="text" class="form-control" id="employeeId" name="employeeId" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">パスワード</label>
+                        <input type="password" class="form-control" id="password" name="password" required />
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">ログイン</button>
+                </form>
+
+                <div class="text-center mt-3">
+                    <small class="text-muted">初期パスワードは社員番号と同じです</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

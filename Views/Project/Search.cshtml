@@ -1,0 +1,73 @@
+@model List<ProjectOrderNumberSystem.Models.Project>
+@{
+    ViewData["Title"] = "案件検索";
+}
+
+<h2>案件検索</h2>
+
+<form method="get" asp-action="Search" class="row g-3 mb-4">
+    <div class="col-md-3">
+        <label for="category" class="form-label">カテゴリ</label>
+        <select class="form-select" id="category" name="category">
+            <option value="">すべて</option>
+            <option value="02" selected="@(ViewData["Category"]?.ToString() == "02" ? "selected" : null)">02 - 設計</option>
+            <option value="03" selected="@(ViewData["Category"]?.ToString() == "03" ? "selected" : null)">03 - トレーニング</option>
+            <option value="04" selected="@(ViewData["Category"]?.ToString() == "04" ? "selected" : null)">04 - 製品販売</option>
+            <option value="06" selected="@(ViewData["Category"]?.ToString() == "06" ? "selected" : null)">06 - システム受託</option>
+            <option value="07" selected="@(ViewData["Category"]?.ToString() == "07" ? "selected" : null)">07 - 小規模開発</option>
+            <option value="08" selected="@(ViewData["Category"]?.ToString() == "08" ? "selected" : null)">08 - 付帯業務</option>
+        </select>
+    </div>
+    <div class="col-md-6">
+        <label for="keyword" class="form-label">キーワード</label>
+        <input type="text" class="form-control" id="keyword" name="keyword" value="@ViewData["Keyword"]" placeholder="受注番号、案件名、客先名、担当者名" />
+    </div>
+    <div class="col-md-3 d-flex align-items-end">
+        <button type="submit" class="btn btn-primary w-100">検索</button>
+    </div>
+</form>
+
+@if (Model != null && Model.Any())
+{
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>受注番号</th>
+                    <th>カテゴリ</th>
+                    <th>案件名</th>
+                    <th>客先名</th>
+                    <th>担当者</th>
+                    <th>費用</th>
+                    <th>納期</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var project in Model)
+                {
+                    <tr>
+                        <td><strong>@project.ProjectNumber</strong></td>
+                        <td>@project.GetCategoryName()</td>
+                        <td>@project.ProjectName</td>
+                        <td>@project.ClientName</td>
+                        <td>@project.StaffName</td>
+                        <td>¥@project.Budget.ToString("N0")</td>
+                        <td>@project.Deadline.ToString("yyyy/MM/dd")</td>
+                        <td>
+                            <a href="/Project/Detail?projectNumber=@project.ProjectNumber" class="btn btn-sm btn-info">詳細</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <p class="text-muted">検索結果: @Model.Count 件</p>
+}
+else
+{
+    <div class="alert alert-info">
+        検索結果がありません
+    </div>
+}
