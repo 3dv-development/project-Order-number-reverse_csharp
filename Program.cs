@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using ProjectOrderNumberSystem.Data;
+using ProjectOrderNumberSystem.Models;
 using ProjectOrderNumberSystem.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,8 +9,15 @@ var builder = WebApplication.CreateBuilder(args);
 var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL")
     ?? builder.Configuration.GetConnectionString("DefaultConnection");
 
+// 接続文字列の検証
+if (string.IsNullOrEmpty(connectionString))
+{
+    Console.WriteLine("[ERROR] No database connection string found. Please set DATABASE_URL environment variable or configure DefaultConnection in appsettings.json");
+    throw new InvalidOperationException("Database connection string is not configured. Please set the DATABASE_URL environment variable on Render.com");
+}
+
 // RenderのPostgreSQL URLをEF Core形式に変換
-if (connectionString != null && connectionString.StartsWith("postgres://"))
+if (connectionString.StartsWith("postgres://"))
 {
     var originalUrl = connectionString;
     connectionString = ConvertPostgresUrl(connectionString);
@@ -18,7 +26,7 @@ if (connectionString != null && connectionString.StartsWith("postgres://"))
 }
 else
 {
-    Console.WriteLine("[WARNING] DATABASE_URL not found or not in postgres:// format");
+    Console.WriteLine($"[INFO] Using connection string format: {(connectionString.Contains("Host=") ? "Npgsql" : "Unknown")}");
 }
 
 // サービスの登録
@@ -74,6 +82,30 @@ using (var scope = app.Services.CreateScope())
                 var employeeCount = await context.Employees.CountAsync();
                 var projectCount = await context.Projects.CountAsync();
                 Console.WriteLine($"[INFO] Found {employeeCount} employees and {projectCount} projects");
+
+                // デフォルト管理者ユーザーの自動作成
+                var adminEmployee = await context.Employees
+                    .FirstOrDefaultAsync(e => e.EmployeeId == "2024");
+
+                if (adminEmployee == null)
+                {
+                    Console.WriteLine("[INFO] Creating default admin user (2024)...");
+                    var newAdmin = new Employee
+                    {
+                        EmployeeId = "2024",
+                        Name = "管理者",
+                        Email = "admin@3dv.co.jp",
+                        IsActive = true,
+                        Role = "admin"
+                    };
+                    context.Employees.Add(newAdmin);
+                    await context.SaveChangesAsync();
+                    Console.WriteLine("[INFO] Default admin user created successfully (ID: 2024, Password: 2024)");
+                }
+                else
+                {
+                    Console.WriteLine($"[INFO] Admin user 2024 already exists (Name: {adminEmployee.Name}, Role: {adminEmployee.Role})");
+                }
             }
             catch (Exception ex)
             {
