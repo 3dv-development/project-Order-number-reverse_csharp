@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>アクセス権限設定ガイド</title>
+    <style>
+        body {
+            font-family: 'Yu Gothic', 'Meiryo', sans-serif;
+            line-height: 1.6;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #34495e;
+            border-bottom: 2px solid #95a5a6;
+            padding-bottom: 5px;
+            margin-top: 30px;
+        }
+        h3 {
+            color: #7f8c8d;
+            margin-top: 20px;
+        }
+        h4 {
+            color: #95a5a6;
+            margin-top: 15px;
+        }
+        ul, ol {
+            margin: 10px 0;
+        }
+        ul ul, ol ol {
+            margin-left: 20px;
+        }
+        strong {
+            color: #2c3e50;
+        }
+        hr {
+            border: none;
+            border-top: 1px solid #ddd;
+            margin: 30px 0;
+        }
+        .intro {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-left: 4px solid #3498db;
+            margin-bottom: 20px;
+        }
+        .checklist {
+            background-color: #e8f5e9;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+        .warning {
+            background-color: #fff3cd;
+            padding: 15px;
+            border-left: 4px solid #ffc107;
+            margin: 15px 0;
+        }
+        .info {
+            background-color: #d1ecf1;
+            padding: 15px;
+            border-left: 4px solid #0dcaf0;
+            margin: 15px 0;
+        }
+        code {
+            background-color: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+    </style>
+</head>
+<body>
+
+<h1>アクセス権限設定ガイド</h1>
+
+<div class="intro">
+    <p>このドキュメントでは、鈴木さん、加瀬さん、夏さんに、GitHubリポジトリとRender.comへのアクセス権限を付与する手順を説明します。</p>
+</div>
+
+<hr>
+
+<h2>1. GitHubリポジトリへのアクセス設定</h2>
+
+<h3>現状確認</h3>
+<ul>
+    <li><strong>Organization</strong>: 3dv-development</li>
+    <li><strong>Repository</strong>: project-Order-number-reverse_csharp</li>
+    <li>鈴木さん、加瀬さん、夏さんは既に組織メンバーとのこと</li>
+</ul>
+
+<h3>アクセス権限の確認・付与手順</h3>
+
+<h4>A. 組織メンバーであることを確認</h4>
+<ol>
+    <li><a href="https://github.com/orgs/3dv-development/people">https://github.com/orgs/3dv-development/people</a> にアクセス</li>
+    <li>鈴木、加瀬、夏の3名が表示されることを確認</li>
+    <li>表示されない場合は、組織のオーナーに招待を依頼</li>
+</ol>
+
+<h4>B. リポジトリへのアクセス権限を付与</h4>
+<ol>
+    <li>リポジトリページにアクセス<br>
+        <a href="https://github.com/3dv-development/project-Order-number-reverse_csharp">https://github.com/3dv-development/project-Order-number-reverse_csharp</a>
+    </li>
+    <li><strong>Settings</strong> タブをクリック</li>
+    <li>左メニューから <strong>Collaborators and teams</strong> をクリック</li>
+    <li><strong>Add people</strong> または <strong>Add teams</strong> をクリック</li>
+    <li>各メンバーを追加:
+        <ul>
+            <li>鈴木</li>
+            <li>加瀬</li>
+            <li>夏</li>
+        </ul>
+    </li>
+    <li><strong>権限レベル</strong>を選択:
+        <ul>
+            <li><strong>Write</strong>: コードの読み書き、ブランチ作成、PRの作成が可能（推奨）</li>
+            <li><strong>Admin</strong>: リポジトリの設定変更も可能</li>
+        </ul>
+    </li>
+    <li><strong>Add to this repository</strong> をクリック</li>
+</ol>
+
+<h3>メンバーへの通知</h3>
+<p>各メンバーには、GitHubから招待メールが届きます。<br>
+メールのリンクから招待を承認してもらってください。</p>
+
+<hr>
+
+<h2>2. Render.comへのアクセス設定</h2>
+
+<h3>前提条件</h3>
+<ul>
+    <li>Render.comアカウントの所有者（長谷部さん）がチーム機能を使用可能である必要があります</li>
+    <li>無料プランの場合、チーム機能が制限されている可能性があります</li>
+</ul>
+
+<h3>オプション1: チーム招待機能を使用（有料プラン）</h3>
+
+<h4>A. チームメンバーとして招待</h4>
+<ol>
+    <li><a href="https://dashboard.render.com/">https://dashboard.render.com/</a> にログイン</li>
+    <li>左上のアカウント名をクリック → <strong>Team Settings</strong> を選択</li>
+    <li><strong>Members</strong> タブをクリック</li>
+    <li><strong>Invite Member</strong> をクリック</li>
+    <li>メンバーのメールアドレスを入力:
+        <ul>
+            <li>鈴木さんのメール</li>
+            <li>加瀬さんのメール</li>
+            <li>夏さんのメール</li>
+        </ul>
+    </li>
+    <li><strong>Role</strong> を選択:
+        <ul>
+            <li><strong>Developer</strong>: サービスのデプロイ、ログ確認が可能（推奨）</li>
+            <li><strong>Admin</strong>: 課金設定も含めすべての権限</li>
+        </ul>
+    </li>
+    <li><strong>Send Invite</strong> をクリック</li>
+    <li>各メンバーに招待メールが届くので、承認してもらう</li>
+</ol>
+
+<h3>オプション2: 無料プランの場合（代替手段）</h3>
+
+<p>無料プランでチーム機能が使えない場合、以下の方法があります:</p>
+
+<h4>A. 認証情報を共有（非推奨）</h4>
+<p>Render.comのログイン情報を安全に共有</p>
+<ul>
+    <li>メリット: すぐに使える</li>
+    <li>デメリット: セキュリティリスク、誰が何をしたか追跡不可</li>
+</ul>
+
+<h4>B. 環境情報のみ共有（推奨）</h4>
+<ul>
+    <li>DATABASE_URLなどの環境変数を共有</li>
+    <li>ローカル開発は可能だが、Render.comの管理画面は見られない</li>
+    <li>本番環境の変更は長谷部さんが実施</li>
+</ul>
+
+<h4>C. 有料プランへのアップグレード</h4>
+<ul>
+    <li>月額$7のStarterプランでチーム機能が利用可能</li>
+    <li>複数人での開発に最適</li>
+</ul>
+
+<div class="info">
+    <h3>推奨: ドキュメント共有のみ</h3>
+    <p>メンバーには以下の情報を共有:</p>
+    <ol>
+        <li><strong>HANDOFF.md</strong> - プロジェクト全体の情報</li>
+        <li><strong>SETUP_ACCESS.md</strong> (このファイル) - アクセス設定手順</li>
+        <li>本番環境URL、管理者アカウント情報</li>
+    </ol>
+    <p>Render.comの管理は長谷部さんが継続し、メンバーはGitHub経由でのコード管理のみ担当</p>
+</div>
+
+<hr>
+
+<h2>3. 各メンバーへの引き継ぎチェックリスト</h2>
+
+<h3>鈴木さん、加瀬さん、夏さんに提供する情報</h3>
+
+<div class="checklist">
+    <h4>✅ GitHubアクセス</h4>
+    <ul>
+        <li>☐ 組織メンバーであることを確認</li>
+        <li>☐ リポジトリへのWrite権限を付与</li>
+        <li>☐ 招待を承認してもらう</li>
+    </ul>
+</div>
+
+<div class="checklist">
+    <h4>✅ Render.com情報</h4>
+    <ul>
+        <li>☐ 本番環境URL: <a href="https://project-order-number-reverse-csharp.onrender.com">https://project-order-number-reverse-csharp.onrender.com</a></li>
+        <li>☐ デプロイ方法の説明（自動デプロイ）</li>
+        <li>☐ （オプション）Render.comダッシュボードへのアクセス</li>
+    </ul>
+</div>
+
+<div class="checklist">
+    <h4>✅ ドキュメント</h4>
+    <ul>
+        <li>☐ HANDOFF.md を読んでもらう</li>
+        <li>☐ README.md があれば確認してもらう</li>
+        <li>☐ ローカル開発環境のセットアップ手順を確認</li>
+    </ul>
+</div>
+
+<div class="checklist">
+    <h4>✅ アカウント情報</h4>
+    <ul>
+        <li>☐ 管理者アカウント（社員番号: 2024, パスワード: 2024）</li>
+        <li>☐ 各自の社員番号でアカウントを作成してもらう</li>
+    </ul>
+</div>
+
+<div class="checklist">
+    <h4>✅ 技術スタック確認</h4>
+    <ul>
+        <li>☐ .NET 8.0 SDKがインストールされているか</li>
+        <li>☐ PostgreSQLがインストールされているか（ローカル開発用）</li>
+        <li>☐ Gitがインストールされているか</li>
+    </ul>
+</div>
+
+<hr>
+
+<h2>4. 引き継ぎミーティングの議題（推奨）</h2>
+
+<h3>議題</h3>
+<ol>
+    <li><strong>プロジェクト概要説明</strong> (10分)
+        <ul>
+            <li>システムの目的と主要機能</li>
+            <li>現在の稼働状況</li>
+        </ul>
+    </li>
+    <li><strong>アーキテクチャ説明</strong> (15分)
+        <ul>
+            <li>ASP.NET Core MVCの構造</li>
+            <li>データベース設計</li>
+            <li>Render.comのインフラ構成</li>
+        </ul>
+    </li>
+    <li><strong>開発フロー</strong> (10分)
+        <ul>
+            <li>ブランチ戦略</li>
+            <li>PRのレビュープロセス</li>
+            <li>デプロイフロー</li>
+        </ul>
+    </li>
+    <li><strong>実演</strong> (15分)
+        <ul>
+            <li>ローカル環境のセットアップ</li>
+            <li>コードの変更とデプロイ</li>
+            <li>ログの確認方法</li>
+        </ul>
+    </li>
+    <li><strong>質疑応答</strong> (10分)</li>
+</ol>
+
+<h3>準備物</h3>
+<ul>
+    <li>☐ HANDOFF.md</li>
+    <li>☐ SETUP_ACCESS.md</li>
+    <li>☐ GitHubリポジトリのURL</li>
+    <li>☐ Render.comのログイン情報（必要な場合）</li>
+    <li>☐ データベースの接続情報</li>
+</ul>
+
+<hr>
+
+<h2>5. よくある質問（FAQ）</h2>
+
+<h3>Q1: Render.comの無料プランの制限は？</h3>
+<p><strong>A</strong>:</p>
+<ul>
+    <li>750時間/月の稼働時間</li>
+    <li>データベース容量: 1GB</li>
+    <li>非アクティブ時にスリープ（15分）</li>
+    <li>月初にリセット</li>
+</ul>
+
+<h3>Q2: データベースのバックアップは？</h3>
+<p><strong>A</strong>: Render.comの無料プランでは自動バックアップなし。手動でpg_dumpを実行する必要があります。</p>
+
+<h3>Q3: 本番環境で問題が発生したらどうする？</h3>
+<p><strong>A</strong>:</p>
+<ol>
+    <li>Render.com Logsでエラーを確認</li>
+    <li>必要に応じてロールバック（前のコミットをデプロイ）</li>
+    <li>緊急時は長谷部さんに連絡</li>
+</ol>
+
+<h3>Q4: 新機能を追加したい場合は？</h3>
+<p><strong>A</strong>:</p>
+<ol>
+    <li>ローカルで開発・テスト</li>
+    <li>GitHubにプッシュ前にレビュー依頼</li>
+    <li>main ブランチにマージで自動デプロイ</li>
+</ol>
+
+<hr>
+
+<h2>6. 緊急連絡先</h2>
+
+<h3>プロジェクト管理者</h3>
+<ul>
+    <li><strong>名前</strong>: 長谷部</li>
+    <li><strong>GitHub</strong>: @hasebe (確認してください)</li>
+    <li><strong>メール</strong>: (記入してください)</li>
+</ul>
+
+<h3>バックアップ担当</h3>
+<p>鈴木、加瀬、夏の中から1名を決定</p>
+
+<hr>
+
+<h2>7. 次のステップ</h2>
+
+<h3>引き継ぎ完了後にすること</h3>
+<ol>
+    <li>☐ 各メンバーのローカル環境セットアップ確認</li>
+    <li>☐ 各メンバーがGitHubにコミット・プッシュできることを確認</li>
+    <li>☐ 簡単な機能追加で開発フローを体験</li>
+    <li>☐ 本番環境での動作確認</li>
+</ol>
+
+<h3>中長期タスク</h3>
+<ol>
+    <li>☐ READMEの充実化</li>
+    <li>☐ テストコードの追加</li>
+    <li>☐ CI/CDパイプラインの構築</li>
+    <li>☐ セキュリティ強化（パスワードハッシュ化など）</li>
+</ol>
+
+<hr>
+
+<p><strong>最終更新</strong>: 2025年10月16日<br>
+<strong>作成者</strong>: 長谷部</p>
+
+</body>
+</html>

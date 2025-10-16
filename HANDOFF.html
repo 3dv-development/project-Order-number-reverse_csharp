@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>プロジェクト引き継ぎドキュメント</title>
+    <style>
+        body {
+            font-family: 'Yu Gothic', 'Meiryo', sans-serif;
+            line-height: 1.6;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #34495e;
+            border-bottom: 2px solid #95a5a6;
+            padding-bottom: 5px;
+            margin-top: 30px;
+        }
+        h3 {
+            color: #7f8c8d;
+            margin-top: 20px;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 20px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #3498db;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        code {
+            background-color: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+        pre {
+            background-color: #f4f4f4;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        pre code {
+            background-color: transparent;
+            padding: 0;
+        }
+        ul, ol {
+            margin: 10px 0;
+        }
+        strong {
+            color: #2c3e50;
+        }
+        hr {
+            border: none;
+            border-top: 1px solid #ddd;
+            margin: 30px 0;
+        }
+    </style>
+</head>
+<body>
+
+<h1>プロジェクト引き継ぎドキュメント</h1>
+
+<h2>プロジェクト概要</h2>
+<p><strong>プロジェクト名</strong>: 案件番号逆引きシステム<br>
+<strong>URL</strong>: <a href="https://project-order-number-reverse-csharp.onrender.com">https://project-order-number-reverse-csharp.onrender.com</a><br>
+<strong>技術スタック</strong>: ASP.NET Core 8.0, PostgreSQL, Render.com</p>
+
+<hr>
+
+<h2>アクセス情報</h2>
+
+<h3>1. GitHubリポジトリ</h3>
+<ul>
+    <li><strong>リポジトリURL</strong>: <a href="https://github.com/3dv-development/project-Order-number-reverse_csharp">https://github.com/3dv-development/project-Order-number-reverse_csharp</a></li>
+    <li><strong>ブランチ</strong>: <code>main</code></li>
+    <li><strong>アクセス</strong>: 3dv-development組織のメンバーは閲覧・編集可能</li>
+</ul>
+
+<h3>2. Render.com</h3>
+<ul>
+    <li><strong>Webサービス名</strong>: <code>project-order-number-reverse-csharp</code></li>
+    <li><strong>データベース名</strong>: <code>project-db</code></li>
+    <li><strong>アクセス権限の追加方法</strong>:
+        <ol>
+            <li>Render.comアカウント所有者が各メンバーをチームに招待</li>
+            <li>Dashboard → Settings → Team Members → Invite</li>
+        </ol>
+    </li>
+</ul>
+
+<h3>3. 管理者アカウント</h3>
+<ul>
+    <li><strong>社員番号</strong>: <code>2024</code></li>
+    <li><strong>パスワード</strong>: <code>2024</code>（初回ログイン後、変更推奨）</li>
+    <li><strong>役割</strong>: admin（新規ユーザー登録が可能）</li>
+</ul>
+
+<hr>
+
+<h2>システム構成</h2>
+
+<h3>インフラ</h3>
+<ul>
+    <li><strong>Webサーバー</strong>: Render.com Web Service (無料プラン)</li>
+    <li><strong>データベース</strong>: Render.com PostgreSQL (無料プラン)</li>
+    <li><strong>自動デプロイ</strong>: GitHubのmainブランチにpushすると自動デプロイ</li>
+</ul>
+
+<h3>環境変数 (Render.com)</h3>
+<p>Webサービスの Environment タブで設定されている環境変数:</p>
+<ul>
+    <li><code>DATABASE_URL</code>: PostgreSQLの接続文字列（自動設定）</li>
+</ul>
+
+<hr>
+
+<h2>主な機能</h2>
+
+<ol>
+    <li><strong>ログイン・認証</strong>
+        <ul>
+            <li>社員番号とパスワードでログイン</li>
+            <li>パスワードは社員番号と同じ（簡易認証）</li>
+            <li>セッションタイムアウト: 8時間</li>
+        </ul>
+    </li>
+    <li><strong>プロジェクト管理</strong>
+        <ul>
+            <li>プロジェクト番号の検索・登録</li>
+            <li>プロジェクト情報の編集</li>
+            <li>編集履歴の記録</li>
+        </ul>
+    </li>
+    <li><strong>ユーザー管理</strong> (管理者のみ)
+        <ul>
+            <li>新規社員アカウントの作成</li>
+            <li>ユーザー一覧の表示</li>
+        </ul>
+    </li>
+</ol>
+
+<hr>
+
+<h2>ローカル開発環境のセットアップ</h2>
+
+<h3>前提条件</h3>
+<ul>
+    <li>.NET 8.0 SDK</li>
+    <li>PostgreSQL 15以上</li>
+    <li>Git</li>
+</ul>
+
+<h3>セットアップ手順</h3>
+
+<ol>
+    <li><strong>リポジトリのクローン</strong>
+        <pre><code>git clone https://github.com/3dv-development/project-Order-number-reverse_csharp.git
+cd project-Order-number-reverse_csharp</code></pre>
+    </li>
+    <li><strong>PostgreSQLデータベースの作成</strong>
+        <pre><code>CREATE DATABASE project_numbers;
+CREATE USER postgres WITH PASSWORD 'postgres';
+GRANT ALL PRIVILEGES ON DATABASE project_numbers TO postgres;</code></pre>
+    </li>
+    <li><strong>接続文字列の確認</strong><br>
+        <code>appsettings.json</code> の <code>DefaultConnection</code> を確認:
+        <pre><code>"ConnectionStrings": {
+  "DefaultConnection": "Host=localhost;Database=project_numbers;Username=postgres;Password=postgres"
+}</code></pre>
+    </li>
+    <li><strong>マイグレーションの適用</strong>
+        <pre><code>dotnet ef database update</code></pre>
+    </li>
+    <li><strong>アプリケーションの起動</strong>
+        <pre><code>dotnet run</code></pre>
+        ブラウザで <a href="http://localhost:5000">http://localhost:5000</a> にアクセス
+    </li>
+    <li><strong>初回起動時</strong>
+        <ul>
+            <li>管理者ユーザー(2024)が自動作成されます</li>
+            <li>社員番号: <code>2024</code>, パスワード: <code>2024</code> でログイン</li>
+        </ul>
+    </li>
+</ol>
+
+<hr>
+
+<h2>デプロイ方法</h2>
+
+<h3>自動デプロイ（推奨）</h3>
+<ol>
+    <li>ローカルで変更を加える</li>
+    <li>Gitコミット＆プッシュ
+        <pre><code>git add .
+git commit -m "変更内容"
+git push origin main</code></pre>
+    </li>
+    <li>Render.comが自動的にデプロイを開始</li>
+    <li>Render.com Dashboard → Logs でデプロイ状況を確認</li>
+</ol>
+
+<h3>手動デプロイ</h3>
+<ol>
+    <li>Render.com Dashboard にアクセス</li>
+    <li>Webサービス <code>project-order-number-reverse-csharp</code> を選択</li>
+    <li>"Manual Deploy" → "Deploy latest commit" をクリック</li>
+</ol>
+
+<hr>
+
+<h2>トラブルシューティング</h2>
+
+<h3>データベース接続エラー</h3>
+<p><strong>エラー</strong>: "データベースに接続できません"</p>
+<p><strong>原因と対策</strong>:</p>
+<ol>
+    <li><strong>環境変数の確認</strong>
+        <ul>
+            <li>Render.com → Web Service → Environment</li>
+            <li><code>DATABASE_URL</code> が設定されているか確認</li>
+        </ul>
+    </li>
+    <li><strong>データベースの稼働確認</strong>
+        <ul>
+            <li>Render.com → PostgreSQL → <code>project-db</code></li>
+            <li>Statusが "Available" になっているか確認</li>
+        </ul>
+    </li>
+    <li><strong>ログの確認</strong>
+        <ul>
+            <li>Render.com → Web Service → Logs</li>
+            <li><code>[ERROR]</code> で始まる行を確認</li>
+        </ul>
+    </li>
+</ol>
+
+<h3>Antiforgeryトークンエラー</h3>
+<p><strong>エラー</strong>: "The antiforgery token could not be decrypted"</p>
+<p><strong>対策</strong>: ブラウザのCookieをクリアしてログインし直す</p>
+
+<h3>アプリケーションが起動しない</h3>
+<p><strong>対策</strong>:</p>
+<ol>
+    <li>Render.com Logs で起動時のエラーを確認</li>
+    <li>ローカルで <code>dotnet build</code> が成功するか確認</li>
+    <li>環境変数が正しく設定されているか確認</li>
+</ol>
+
+<hr>
+
+<h2>データベーススキーマ</h2>
+
+<h3>employees テーブル</h3>
+<table>
+    <thead>
+        <tr>
+            <th>カラム名</th>
+            <th>型</th>
+            <th>説明</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr><td>id</td><td>integer</td><td>主キー（自動採番）</td></tr>
+        <tr><td>employee_id</td><td>varchar(50)</td><td>社員番号（ユニーク）</td></tr>
+        <tr><td>name</td><td>varchar(100)</td><td>氏名</td></tr>
+        <tr><td>email</td><td>varchar(200)</td><td>メールアドレス</td></tr>
+        <tr><td>is_active</td><td>boolean</td><td>アクティブフラグ</td></tr>
+        <tr><td>role</td><td>varchar(20)</td><td>役割 (admin/user)</td></tr>
+    </tbody>
+</table>
+
+<h3>projects テーブル</h3>
+<table>
+    <thead>
+        <tr>
+            <th>カラム名</th>
+            <th>型</th>
+            <th>説明</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr><td>id</td><td>integer</td><td>主キー（自動採番）</td></tr>
+        <tr><td>project_number</td><td>varchar(50)</td><td>プロジェクト番号（ユニーク）</td></tr>
+        <tr><td>title</td><td>varchar(200)</td><td>プロジェクト名</td></tr>
+        <tr><td>client_name</td><td>varchar(200)</td><td>クライアント名</td></tr>
+        <tr><td>status</td><td>varchar(20)</td><td>ステータス</td></tr>
+        <tr><td>created_at</td><td>timestamp</td><td>作成日時</td></tr>
+        <tr><td>updated_at</td><td>timestamp</td><td>更新日時</td></tr>
+        <tr><td>created_by</td><td>varchar(50)</td><td>作成者の社員番号</td></tr>
+        <tr><td>updated_by</td><td>varchar(50)</td><td>更新者の社員番号</td></tr>
+    </tbody>
+</table>
+
+<h3>edit_histories テーブル</h3>
+<table>
+    <thead>
+        <tr>
+            <th>カラム名</th>
+            <th>型</th>
+            <th>説明</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr><td>id</td><td>integer</td><td>主キー（自動採番）</td></tr>
+        <tr><td>project_id</td><td>integer</td><td>プロジェクトID（外部キー）</td></tr>
+        <tr><td>edited_by</td><td>varchar(50)</td><td>編集者の社員番号</td></tr>
+        <tr><td>edited_at</td><td>timestamp</td><td>編集日時</td></tr>
+        <tr><td>changes</td><td>text</td><td>変更内容（JSON）</td></tr>
+    </tbody>
+</table>
+
+<hr>
+
+<h2>連絡先・サポート</h2>
+
+<h3>開発メンバー</h3>
+<ul>
+    <li>鈴木</li>
+    <li>加瀬</li>
+    <li>夏</li>
+</ul>
+
+<h3>リポジトリ管理</h3>
+<ul>
+    <li>Organization: 3dv-development</li>
+    <li>Repository: project-Order-number-reverse_csharp</li>
+</ul>
+
+<h3>問題報告</h3>
+<p>GitHubのIssuesを使用してください:<br>
+<a href="https://github.com/3dv-development/project-Order-number-reverse_csharp/issues">https://github.com/3dv-development/project-Order-number-reverse_csharp/issues</a></p>
+
+<hr>
+
+<h2>今後の改善案</h2>
+
+<ol>
+    <li><strong>セキュリティ強化</strong>
+        <ul>
+            <li>パスワードのハッシュ化（現在は社員番号=パスワード）</li>
+            <li>HTTPS証明書の設定</li>
+            <li>ログイン試行回数制限</li>
+        </ul>
+    </li>
+    <li><strong>機能追加</strong>
+        <ul>
+            <li>プロジェクト検索のフィルター機能</li>
+            <li>CSVエクスポート機能</li>
+            <li>メール通知機能（現在は無効化中）</li>
+        </ul>
+    </li>
+    <li><strong>インフラ改善</strong>
+        <ul>
+            <li>有料プランへの移行（パフォーマンス向上）</li>
+            <li>バックアップの自動化</li>
+            <li>モニタリング・アラート設定</li>
+        </ul>
+    </li>
+</ol>
+
+<hr>
+
+<p><strong>作成日</strong>: 2025年10月16日<br>
+<strong>作成者</strong>: 長谷部</p>
+
+</body>
+</html>
