@@ -33,7 +33,8 @@ namespace ProjectOrderNumberSystem.Services
                 }
 
                 var client = _httpClientFactory.CreateClient();
-                client.DefaultRequestHeaders.Add("Authorization", $"Bearer {ApiKey}:{ApiToken}");
+                client.DefaultRequestHeaders.Add("x-api-key", ApiKey);
+                client.DefaultRequestHeaders.Add("Authorization", $"Bearer {ApiToken}");
 
                 var response = await client.GetAsync($"{BaseUrl}/projects?project_no={caseNumber}");
 
@@ -67,7 +68,8 @@ namespace ProjectOrderNumberSystem.Services
                 }
 
                 var client = _httpClientFactory.CreateClient();
-                client.DefaultRequestHeaders.Add("Authorization", $"Bearer {ApiKey}:{ApiToken}");
+                client.DefaultRequestHeaders.Add("x-api-key", ApiKey);
+                client.DefaultRequestHeaders.Add("Authorization", $"Bearer {ApiToken}");
 
                 var url = $"{BaseUrl}/projects?per_page={perPage}&sort=-created_at";
 
@@ -110,7 +112,8 @@ namespace ProjectOrderNumberSystem.Services
                 }
 
                 var client = _httpClientFactory.CreateClient();
-                client.DefaultRequestHeaders.Add("Authorization", $"Bearer {ApiKey}:{ApiToken}");
+                client.DefaultRequestHeaders.Add("x-api-key", ApiKey);
+                client.DefaultRequestHeaders.Add("Authorization", $"Bearer {ApiToken}");
 
                 var data = new
                 {

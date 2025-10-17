@@ -71,6 +71,40 @@ namespace ProjectOrderNumberSystem.Controllers
 
                 project.StaffName = staff.Name;
 
+                // Board連携: 案件Noがある場合、Board APIから案件情報を取得
+                int? boardProjectId = null;
+                if (!string.IsNullOrEmpty(project.CaseNumber))
+                {
+                    try
+                    {
+                        var boardProject = await _boardApiService.GetProjectByNumberAsync(project.CaseNumber);
+                        if (boardProject != null)
+                        {
+                            // Board APIから案件名とクライアント名を取得して設定
+                            if (boardProject.name != null)
+                            {
+                                project.ProjectName = boardProject.name.ToString();
+                            }
+
+                            if (boardProject.client?.name != null)
+                            {
+                                project.ClientName = boardProject.client.name.ToString();
+                            }
+
+                            // Board project IDを保存（後で管理番号を更新するため）
+                            if (boardProject.id != null)
+                            {
+                                boardProjectId = (int)boardProject.id;
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        // Board連携エラーはログに出力するが処理は続行
+                        Console.WriteLine($"Board API取得エラー: {ex.Message}");
+                    }
+                }
+
                 // プロジェクトを作成
                 var createdProject = await _projectService.CreateProjectAsync(
                     project,
@@ -81,21 +115,20 @@ namespace ProjectOrderNumberSystem.Controllers
                 // メール送信（一時的に無効化）
                 // await _emailService.SendNotificationEmailAsync(createdProject);
 
-                // Board連携: 案件Noがある場合、受注番号をboardに登録
-                if (!string.IsNullOrEmpty(project.CaseNumber))
+                // Board連携: 受注番号をboardに登録
+                if (boardProjectId.HasValue)
                 {
                     try
                     {
-                        var boardProject = await _boardApiService.GetProjectByNumberAsync(project.CaseNumber);
-                        if (boardProject != null)
-                        {
-                            // 実装は要調整（boardProjectの構造に依存）
-                        }
+                        await _boardApiService.UpdateProjectManagementNumberAsync(
+                            boardProjectId.Value,
+                            createdProject.ProjectNumber
+                        );
                     }
                     catch (Exception ex)
                     {
-                        // Board連携エラーは無視
-                        Console.WriteLine($"Board連携エラー: {ex.Message}");
+                        // Board連携エラーはログに出力
+                        Console.WriteLine($"Board管理番号更新エラー: {ex.Message}");
                     }
                 }
 
