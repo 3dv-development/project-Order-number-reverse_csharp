@@ -25,7 +25,7 @@
                 <label for="boardProject" class="form-label">Board案件を選択（オプション）</label>
                 <select class="form-select" id="boardProject" name="boardProject">
                     <option value="">-- Board案件から選択 --</option>
-                    @if (ViewBag.BoardProjects != null)
+                    @if (ViewBag.BoardProjects != null && ViewBag.BoardProjects.Count > 0)
                     {
                         foreach (var bp in ViewBag.BoardProjects)
                         {
@@ -37,8 +37,21 @@
                             </option>
                         }
                     }
+                    else
+                    {
+                        <option value="" disabled>Board案件の取得に失敗しました</option>
+                    }
                 </select>
-                <small class="form-text text-muted">Board案件を選択すると、案件Noと案件名、客先名が自動入力されます</small>
+                <small class="form-text text-muted">
+                    @if (ViewBag.BoardProjects != null && ViewBag.BoardProjects.Count > 0)
+                    {
+                        <span>Board案件を選択すると、案件Noと案件名、客先名が自動入力されます（@ViewBag.BoardProjects.Count 件）</span>
+                    }
+                    else
+                    {
+                        <span class="text-warning">Board APIから案件を取得できませんでした。手動で入力してください。</span>
+                    }
+                </small>
             </div>
 
             <div class="mb-3">

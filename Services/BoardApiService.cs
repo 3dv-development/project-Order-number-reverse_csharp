@@ -61,9 +61,13 @@ namespace ProjectOrderNumberSystem.Services
         {
             try
             {
+                _logger.LogInformation($"[BoardApi] 案件一覧取得開始 (perPage={perPage})");
+
                 if (string.IsNullOrEmpty(ApiKey) || string.IsNullOrEmpty(ApiToken))
                 {
-                    _logger.LogWarning("Board API認証情報が設定されていません");
+                    _logger.LogWarning("[BoardApi] Board API認証情報が設定されていません (ApiKey={0}, ApiToken={1})",
+                        string.IsNullOrEmpty(ApiKey) ? "null" : "設定あり",
+                        string.IsNullOrEmpty(ApiToken) ? "null" : "設定あり");
                     return new List<dynamic>();
                 }
 
@@ -72,13 +76,18 @@ namespace ProjectOrderNumberSystem.Services
                 client.DefaultRequestHeaders.Add("Authorization", $"Bearer {ApiToken}");
 
                 var url = $"{BaseUrl}/projects?per_page={perPage}&sort=-created_at";
+                _logger.LogInformation($"[BoardApi] リクエストURL: {url}");
 
                 var response = await client.GetAsync(url);
+                _logger.LogInformation($"[BoardApi] HTTPステータス: {response.StatusCode}");
 
                 if (response.IsSuccessStatusCode)
                 {
                     var content = await response.Content.ReadAsStringAsync();
+                    _logger.LogInformation($"[BoardApi] レスポンス長: {content?.Length ?? 0} bytes");
+
                     var result = JsonConvert.DeserializeObject<List<dynamic>>(content);
+                    _logger.LogInformation($"[BoardApi] デシリアライズ結果: {result?.Count ?? 0} 件");
 
                     if (result != null && filterEmptyManagementNo)
                     {
@@ -88,12 +97,17 @@ namespace ProjectOrderNumberSystem.Services
 
                     return result ?? new List<dynamic>();
                 }
+                else
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    _logger.LogError($"[BoardApi] エラーレスポンス: {response.StatusCode} - {errorContent}");
+                }
 
                 return new List<dynamic>();
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Board API エラー: 案件一覧取得");
+                _logger.LogError(ex, "[BoardApi] 案件一覧取得エラー");
                 return new List<dynamic>();
             }
         }

@@ -46,26 +46,43 @@ namespace ProjectOrderNumberSystem.Controllers
             // Board APIから管理番号が空の案件一覧を取得
             try
             {
+                Console.WriteLine("[Board API] 案件取得を開始します");
                 var boardProjects = await _boardApiService.SearchProjectsAsync(100, false);
-                var emptyManagementProjects = boardProjects
-                    .Where(p => string.IsNullOrEmpty(p.management_number?.ToString()))
-                    .Select(p => new
-                    {
-                        Id = p.id?.ToString() ?? "",
-                        ProjectNo = p.project_no?.ToString() ?? "",
-                        Name = p.name?.ToString() ?? "",
-                        ClientName = p.client?.name?.ToString() ?? "",
-                        OrderStatus = p.order_status_name?.ToString() ?? ""
-                    })
-                    .OrderByDescending(p => p.ProjectNo)
-                    .ToList();
+                Console.WriteLine($"[Board API] {boardProjects?.Count ?? 0} 件の案件を取得しました");
 
-                ViewBag.BoardProjects = emptyManagementProjects;
+                if (boardProjects != null && boardProjects.Count > 0)
+                {
+                    var emptyManagementProjects = boardProjects
+                        .Where(p => string.IsNullOrEmpty(p.management_number?.ToString()))
+                        .Select(p => new
+                        {
+                            Id = p.id?.ToString() ?? "",
+                            ProjectNo = p.project_no?.ToString() ?? "",
+                            Name = p.name?.ToString() ?? "",
+                            ClientName = p.client?.name?.ToString() ?? "",
+                            OrderStatus = p.order_status_name?.ToString() ?? ""
+                        })
+                        .OrderByDescending(p => p.ProjectNo)
+                        .ToList();
+
+                    Console.WriteLine($"[Board API] 管理番号が空の案件: {emptyManagementProjects.Count} 件");
+                    ViewBag.BoardProjects = emptyManagementProjects;
+                    ViewBag.BoardApiStatus = "success";
+                }
+                else
+                {
+                    Console.WriteLine("[Board API] 取得した案件が0件です");
+                    ViewBag.BoardProjects = new List<object>();
+                    ViewBag.BoardApiStatus = "empty";
+                }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Board API取得エラー: {ex.Message}");
+                Console.WriteLine($"[Board API] エラー: {ex.GetType().Name} - {ex.Message}");
+                Console.WriteLine($"[Board API] スタックトレース: {ex.StackTrace}");
                 ViewBag.BoardProjects = new List<object>();
+                ViewBag.BoardApiStatus = "error";
+                ViewBag.BoardApiError = ex.Message;
             }
 
             return View();
