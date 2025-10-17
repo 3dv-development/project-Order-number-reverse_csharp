@@ -28,6 +28,7 @@
                     <th>案件No</th>
                     <th>案件名</th>
                     <th>クライアント名</th>
+                    <th>金額</th>
                     <th>ステータス</th>
                     <th>管理番号</th>
                     <th>作成日</th>
@@ -50,6 +51,16 @@
                             }
                         </td>
                         <td>@project.ClientName</td>
+                        <td>
+                            @if (!string.IsNullOrEmpty(project.Amount))
+                            {
+                                <span>¥@project.Amount</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted">-</span>
+                            }
+                        </td>
                         <td>@project.OrderStatus</td>
                         <td>
                             @if (string.IsNullOrEmpty(project.ManagementNumber))

@@ -60,7 +60,9 @@ namespace ProjectOrderNumberSystem.Controllers
                             ProjectNo = p.project_no?.ToString() ?? "",
                             Name = p.name?.ToString() ?? "",
                             ClientName = p.client?.name?.ToString() ?? "",
-                            OrderStatus = p.order_status_name?.ToString() ?? ""
+                            OrderStatus = p.order_status_name?.ToString() ?? "",
+                            // 金額フィールドの候補をすべて試す
+                            Amount = p.amount?.ToString() ?? p.budget?.ToString() ?? p.price?.ToString() ?? p.order_amount?.ToString() ?? p.total_amount?.ToString() ?? ""
                         })
                         .OrderByDescending(p => p.ProjectNo)
                         .ToList();
@@ -131,6 +133,18 @@ namespace ProjectOrderNumberSystem.Controllers
                             if (boardProject.client?.name != null)
                             {
                                 project.ClientName = boardProject.client.name.ToString();
+                            }
+
+                            // 金額を取得（複数のフィールド候補を試す）
+                            var amountStr = boardProject.amount?.ToString() ??
+                                          boardProject.budget?.ToString() ??
+                                          boardProject.price?.ToString() ??
+                                          boardProject.order_amount?.ToString() ??
+                                          boardProject.total_amount?.ToString();
+
+                            if (!string.IsNullOrEmpty(amountStr) && decimal.TryParse(amountStr, out decimal amount))
+                            {
+                                project.Budget = amount;
                             }
 
                             // Board project IDを保存（後で管理番号を更新するため）
@@ -368,7 +382,9 @@ namespace ProjectOrderNumberSystem.Controllers
                         ClientName = p.client?.name?.ToString(),
                         ManagementNumber = p.management_number?.ToString(),
                         OrderStatus = p.order_status_name?.ToString(),
-                        CreatedAt = p.created_at?.ToString()
+                        CreatedAt = p.created_at?.ToString(),
+                        // 金額フィールドの候補をすべて試す
+                        Amount = p.amount?.ToString() ?? p.budget?.ToString() ?? p.price?.ToString() ?? p.order_amount?.ToString() ?? p.total_amount?.ToString() ?? ""
                     })
                     .ToList();
 

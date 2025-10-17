@@ -32,6 +32,7 @@
                             <option value="@bp.ProjectNo"
                                     data-name="@bp.Name"
                                     data-client="@bp.ClientName"
+                                    data-amount="@bp.Amount"
                                     data-id="@bp.Id">
                                 [@bp.ProjectNo] @bp.Name (@bp.ClientName)
                             </option>
@@ -45,7 +46,7 @@
                 <small class="form-text text-muted">
                     @if (ViewBag.BoardProjects != null && ViewBag.BoardProjects.Count > 0)
                     {
-                        <span>Board案件を選択すると、案件Noと案件名、客先名が自動入力されます（@ViewBag.BoardProjects.Count 件）</span>
+                        <span>Board案件を選択すると、案件No、案件名、客先名、金額が自動入力されます（@ViewBag.BoardProjects.Count 件）</span>
                     }
                     else
                     {
@@ -120,25 +121,36 @@ document.getElementById('boardProject').addEventListener('change', function() {
         const projectNo = selectedOption.value;
         const projectName = selectedOption.getAttribute('data-name');
         const clientName = selectedOption.getAttribute('data-client');
+        const amount = selectedOption.getAttribute('data-amount');
 
         // 各フィールドに自動入力
         document.getElementById('caseNumber').value = projectNo;
         document.getElementById('projectName').value = projectName;
         document.getElementById('clientName').value = clientName;
 
+        // 金額が存在する場合は自動入力
+        if (amount && amount !== '') {
+            document.getElementById('budget').value = amount;
+        }
+
         // 視覚的なフィードバック
         document.getElementById('projectName').classList.add('bg-success', 'bg-opacity-10');
         document.getElementById('clientName').classList.add('bg-success', 'bg-opacity-10');
+        if (amount && amount !== '') {
+            document.getElementById('budget').classList.add('bg-success', 'bg-opacity-10');
+        }
 
         setTimeout(() => {
             document.getElementById('projectName').classList.remove('bg-success', 'bg-opacity-10');
             document.getElementById('clientName').classList.remove('bg-success', 'bg-opacity-10');
+            document.getElementById('budget').classList.remove('bg-success', 'bg-opacity-10');
         }, 1000);
     } else {
         // 選択解除時はクリア
         document.getElementById('caseNumber').value = '';
         document.getElementById('projectName').value = '';
         document.getElementById('clientName').value = '';
+        document.getElementById('budget').value = '0';
     }
 });
 
