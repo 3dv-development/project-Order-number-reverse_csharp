@@ -299,5 +299,48 @@ namespace ProjectOrderNumberSystem.Controllers
                 return RedirectToAction("Detail", new { projectNumber });
             }
         }
+
+        // Board連携テスト - 管理番号が空の案件一覧
+        [HttpGet]
+        public async Task<IActionResult> BoardTest()
+        {
+            var employeeId = HttpContext.Session.GetString("EmployeeId");
+            if (string.IsNullOrEmpty(employeeId))
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            try
+            {
+                // Board APIから案件一覧を取得
+                var boardProjects = await _boardApiService.SearchProjectsAsync(100, false);
+
+                // 管理番号が空の案件のみフィルタリング
+                var emptyManagementProjects = boardProjects
+                    .Where(p => string.IsNullOrEmpty(p.management_number?.ToString()))
+                    .Select(p => new
+                    {
+                        Id = p.id?.ToString(),
+                        ProjectNo = p.project_no?.ToString(),
+                        Name = p.name?.ToString(),
+                        ClientName = p.client?.name?.ToString(),
+                        ManagementNumber = p.management_number?.ToString(),
+                        OrderStatus = p.order_status_name?.ToString(),
+                        CreatedAt = p.created_at?.ToString()
+                    })
+                    .ToList();
+
+                ViewBag.Projects = emptyManagementProjects;
+                ViewBag.TotalCount = emptyManagementProjects.Count;
+
+                return View();
+            }
+            catch (Exception ex)
+            {
+                ViewBag.Error = $"Board API エラー: {ex.Message}";
+                ViewBag.Projects = new List<object>();
+                return View();
+            }
+        }
     }
 }
