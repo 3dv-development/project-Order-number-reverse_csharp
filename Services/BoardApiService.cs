@@ -26,9 +26,11 @@ namespace ProjectOrderNumberSystem.Services
         {
             try
             {
+                _logger.LogInformation($"[BoardApi] 案件番号で検索: {caseNumber}");
+
                 if (string.IsNullOrEmpty(ApiKey) || string.IsNullOrEmpty(ApiToken))
                 {
-                    _logger.LogWarning("Board API認証情報が設定されていません");
+                    _logger.LogWarning("[BoardApi] Board API認証情報が設定されていません");
                     return null;
                 }
 
@@ -36,20 +38,38 @@ namespace ProjectOrderNumberSystem.Services
                 client.DefaultRequestHeaders.Add("x-api-key", ApiKey);
                 client.DefaultRequestHeaders.Add("Authorization", $"Bearer {ApiToken}");
 
-                var response = await client.GetAsync($"{BaseUrl}/projects?project_no={caseNumber}");
+                var url = $"{BaseUrl}/projects?project_no={caseNumber}";
+                _logger.LogInformation($"[BoardApi] リクエストURL: {url}");
+
+                var response = await client.GetAsync(url);
+                _logger.LogInformation($"[BoardApi] HTTPステータス: {response.StatusCode}");
 
                 if (response.IsSuccessStatusCode)
                 {
                     var content = await response.Content.ReadAsStringAsync();
-                    var result = JsonConvert.DeserializeObject<dynamic>(content);
-                    return result;
+                    _logger.LogInformation($"[BoardApi] レスポンス: {content}");
+
+                    var result = JsonConvert.DeserializeObject<List<dynamic>>(content);
+
+                    if (result != null && result.Count > 0)
+                    {
+                        _logger.LogInformation($"[BoardApi] 案件を発見: ID={result[0].id}, 案件名={result[0].name}");
+                        return result[0]; // 配列の最初の要素を返す
+                    }
+
+                    _logger.LogWarning($"[BoardApi] 案件番号 {caseNumber} が見つかりません");
+                }
+                else
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    _logger.LogError($"[BoardApi] エラーレスポンス: {response.StatusCode} - {errorContent}");
                 }
 
                 return null;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Board API エラー: 案件番号 {caseNumber}");
+                _logger.LogError(ex, $"[BoardApi] 案件番号 {caseNumber} の取得エラー");
                 return null;
             }
         }
@@ -119,9 +139,11 @@ namespace ProjectOrderNumberSystem.Services
         {
             try
             {
+                _logger.LogInformation($"[BoardApi] 管理番号更新開始: ProjectId={projectId}, ManagementNumber={managementNumber}");
+
                 if (string.IsNullOrEmpty(ApiKey) || string.IsNullOrEmpty(ApiToken))
                 {
-                    _logger.LogWarning("Board API認証情報が設定されていません");
+                    _logger.LogWarning("[BoardApi] Board API認証情報が設定されていません");
                     return false;
                 }
 
@@ -135,15 +157,31 @@ namespace ProjectOrderNumberSystem.Services
                 };
 
                 var json = JsonConvert.SerializeObject(data);
+                _logger.LogInformation($"[BoardApi] リクエストボディ: {json}");
+
                 var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
 
-                var response = await client.PutAsync($"{BaseUrl}/projects/{projectId}", content);
+                var url = $"{BaseUrl}/projects/{projectId}";
+                _logger.LogInformation($"[BoardApi] PUT {url}");
 
-                return response.IsSuccessStatusCode;
+                var response = await client.PutAsync(url, content);
+                _logger.LogInformation($"[BoardApi] HTTPステータス: {response.StatusCode}");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    _logger.LogInformation($"[BoardApi] 管理番号更新成功: ProjectId={projectId}");
+                    return true;
+                }
+                else
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    _logger.LogError($"[BoardApi] 管理番号更新失敗: {response.StatusCode} - {errorContent}");
+                    return false;
+                }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Board API エラー: 管理番号更新 (ProjectId: {projectId})");
+                _logger.LogError(ex, $"[BoardApi] 管理番号更新エラー (ProjectId: {projectId})");
                 return false;
             }
         }
