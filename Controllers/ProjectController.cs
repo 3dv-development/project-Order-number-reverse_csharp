@@ -43,6 +43,31 @@ namespace ProjectOrderNumberSystem.Controllers
             ViewData["Employees"] = employees;
             ViewData["EmployeeId"] = employeeId;
 
+            // Board APIから管理番号が空の案件一覧を取得
+            try
+            {
+                var boardProjects = await _boardApiService.SearchProjectsAsync(100, false);
+                var emptyManagementProjects = boardProjects
+                    .Where(p => string.IsNullOrEmpty(p.management_number?.ToString()))
+                    .Select(p => new
+                    {
+                        Id = p.id?.ToString() ?? "",
+                        ProjectNo = p.project_no?.ToString() ?? "",
+                        Name = p.name?.ToString() ?? "",
+                        ClientName = p.client?.name?.ToString() ?? "",
+                        OrderStatus = p.order_status_name?.ToString() ?? ""
+                    })
+                    .OrderByDescending(p => p.ProjectNo)
+                    .ToList();
+
+                ViewBag.BoardProjects = emptyManagementProjects;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Board API取得エラー: {ex.Message}");
+                ViewBag.BoardProjects = new List<object>();
+            }
+
             return View();
         }
 

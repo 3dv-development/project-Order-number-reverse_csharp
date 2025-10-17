@@ -22,9 +22,29 @@
             </div>
 
             <div class="mb-3">
+                <label for="boardProject" class="form-label">Board案件を選択（オプション）</label>
+                <select class="form-select" id="boardProject" name="boardProject">
+                    <option value="">-- Board案件から選択 --</option>
+                    @if (ViewBag.BoardProjects != null)
+                    {
+                        foreach (var bp in ViewBag.BoardProjects)
+                        {
+                            <option value="@bp.ProjectNo"
+                                    data-name="@bp.Name"
+                                    data-client="@bp.ClientName"
+                                    data-id="@bp.Id">
+                                [@bp.ProjectNo] @bp.Name (@bp.ClientName)
+                            </option>
+                        }
+                    }
+                </select>
+                <small class="form-text text-muted">Board案件を選択すると、案件Noと案件名、客先名が自動入力されます</small>
+            </div>
+
+            <div class="mb-3">
                 <label for="caseNumber" class="form-label">案件No</label>
                 <input type="text" class="form-control" id="caseNumber" name="caseNumber" />
-                <small class="form-text text-muted">オプション</small>
+                <small class="form-text text-muted">手動入力も可能</small>
             </div>
 
             <div class="mb-3">
@@ -78,6 +98,37 @@
 
 @section Scripts {
 <script>
+// Board案件選択時の自動入力
+document.getElementById('boardProject').addEventListener('change', function() {
+    const selectedOption = this.options[this.selectedIndex];
+
+    if (selectedOption.value) {
+        // 選択された案件の情報を取得
+        const projectNo = selectedOption.value;
+        const projectName = selectedOption.getAttribute('data-name');
+        const clientName = selectedOption.getAttribute('data-client');
+
+        // 各フィールドに自動入力
+        document.getElementById('caseNumber').value = projectNo;
+        document.getElementById('projectName').value = projectName;
+        document.getElementById('clientName').value = clientName;
+
+        // 視覚的なフィードバック
+        document.getElementById('projectName').classList.add('bg-success', 'bg-opacity-10');
+        document.getElementById('clientName').classList.add('bg-success', 'bg-opacity-10');
+
+        setTimeout(() => {
+            document.getElementById('projectName').classList.remove('bg-success', 'bg-opacity-10');
+            document.getElementById('clientName').classList.remove('bg-success', 'bg-opacity-10');
+        }, 1000);
+    } else {
+        // 選択解除時はクリア
+        document.getElementById('caseNumber').value = '';
+        document.getElementById('projectName').value = '';
+        document.getElementById('clientName').value = '';
+    }
+});
+
 document.getElementById('createForm').addEventListener('submit', async function(e) {
     e.preventDefault();
 
