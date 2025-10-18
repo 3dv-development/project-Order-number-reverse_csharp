@@ -1,6 +1,8 @@
 @model List<ProjectOrderNumberSystem.Models.Employee>
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
 @{
     ViewData["Title"] = "ユーザー一覧";
+    var currentEmployeeId = HttpContextAccessor.HttpContext?.Session.GetString("EmployeeId");
 }
 
 <h2>ユーザー一覧</h2>
@@ -38,14 +40,22 @@
                             <th>メールアドレス</th>
                             <th>権限</th>
                             <th>状態</th>
+                            <th>操作</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach (var user in Model)
                         {
+                            var isSelf = user.EmployeeId == currentEmployeeId;
                             <tr>
                                 <td>@user.EmployeeId</td>
-                                <td>@user.Name</td>
+                                <td>
+                                    @user.Name
+                                    @if (isSelf)
+                                    {
+                                        <span class="badge bg-info">自分</span>
+                                    }
+                                </td>
                                 <td>@(string.IsNullOrEmpty(user.Email) ? "-" : user.Email)</td>
                                 <td>
                                     @if (user.Role == "admin")
@@ -67,6 +77,32 @@
                                         <span class="badge bg-secondary">無効</span>
                                     }
                                 </td>
+                                <td>
+                                    @if (!isSelf)
+                                    {
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            @if (user.Role == "user")
+                                            {
+                                                <button type="button" class="btn btn-warning" onclick="changeRole('@user.EmployeeId', 'admin', '@user.Name')">
+                                                    管理者にする
+                                                </button>
+                                            }
+                                            else
+                                            {
+                                                <button type="button" class="btn btn-secondary" onclick="changeRole('@user.EmployeeId', 'user', '@user.Name')">
+                                                    一般にする
+                                                </button>
+                                            }
+                                            <button type="button" class="btn @(user.IsActive ? "btn-outline-danger" : "btn-outline-success")" onclick="toggleActive('@user.EmployeeId', '@user.Name', @user.IsActive.ToString().ToLower())">
+                                                @(user.IsActive ? "無効化" : "有効化")
+                                            </button>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">-</span>
+                                    }
+                                </td>
                             </tr>
                         }
                     </tbody>
@@ -84,7 +120,56 @@
     <h5>注意事項</h5>
     <ul>
         <li>全ユーザーの初期パスワードは社員番号と同じです</li>
-        <li>ユーザーの権限変更や無効化は、データベースで直接操作してください</li>
-        <li>管理者権限のユーザーは、案件の削除や新規ユーザー登録が可能です</li>
+        <li>管理者権限のユーザーは、案件の削除、CSV出力、新規ユーザー登録が可能です</li>
+        <li>自分自身の権限変更や無効化はできません</li>
+        <li>無効化されたユーザーはログインできなくなります</li>
     </ul>
 </div>
+
+<script>
+function changeRole(employeeId, newRole, employeeName) {
+    const roleName = newRole === 'admin' ? '管理者' : '一般ユーザー';
+    if (confirm(`${employeeName}（${employeeId}）の権限を「${roleName}」に変更してもよろしいですか？`)) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/Account/ChangeRole';
+
+        const inputEmployeeId = document.createElement('input');
+        inputEmployeeId.type = 'hidden';
+        inputEmployeeId.name = 'employeeId';
+        inputEmployeeId.value = employeeId;
+
+        const inputNewRole = document.createElement('input');
+        inputNewRole.type = 'hidden';
+        inputNewRole.name = 'newRole';
+        inputNewRole.value = newRole;
+
+        form.appendChild(inputEmployeeId);
+        form.appendChild(inputNewRole);
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+
+function toggleActive(employeeId, employeeName, isCurrentlyActive) {
+    const action = isCurrentlyActive ? '無効化' : '有効化';
+    const message = isCurrentlyActive
+        ? `${employeeName}（${employeeId}）を無効化してもよろしいですか？\n\n無効化されたユーザーはログインできなくなります。`
+        : `${employeeName}（${employeeId}）を有効化してもよろしいですか？`;
+
+    if (confirm(message)) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/Account/ToggleActive';
+
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'employeeId';
+        input.value = employeeId;
+
+        form.appendChild(input);
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+</script>

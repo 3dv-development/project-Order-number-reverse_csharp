@@ -160,5 +160,113 @@ namespace ProjectOrderNumberSystem.Controllers
 
             return View(users);
         }
+
+        /// <summary>
+        /// ユーザー権限変更（管理者のみ）
+        /// </summary>
+        [HttpPost]
+        public async Task<IActionResult> ChangeRole(string employeeId, string newRole)
+        {
+            // 管理者権限チェック
+            var currentRole = HttpContext.Session.GetString("Role");
+            if (currentRole != "admin")
+            {
+                TempData["Error"] = "管理者権限が必要です";
+                return RedirectToAction("Index", "Home");
+            }
+
+            // 自分自身の権限は変更できない
+            var currentEmployeeId = HttpContext.Session.GetString("EmployeeId");
+            if (employeeId == currentEmployeeId)
+            {
+                TempData["Error"] = "自分自身の権限は変更できません";
+                return RedirectToAction("UserList");
+            }
+
+            // 権限の妥当性チェック
+            if (newRole != "admin" && newRole != "user")
+            {
+                TempData["Error"] = "無効な権限です";
+                return RedirectToAction("UserList");
+            }
+
+            try
+            {
+                var employee = await _context.Employees
+                    .FirstOrDefaultAsync(e => e.EmployeeId == employeeId);
+
+                if (employee == null)
+                {
+                    TempData["Error"] = "ユーザーが見つかりません";
+                    return RedirectToAction("UserList");
+                }
+
+                var oldRole = employee.Role;
+                employee.Role = newRole;
+                await _context.SaveChangesAsync();
+
+                var roleName = newRole == "admin" ? "管理者" : "一般ユーザー";
+                TempData["Success"] = $"{employee.Name}（{employeeId}）の権限を「{roleName}」に変更しました";
+                Console.WriteLine($"[INFO] Role changed: {employeeId} ({oldRole} → {newRole})");
+
+                return RedirectToAction("UserList");
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = $"権限変更に失敗しました: {ex.Message}";
+                Console.WriteLine($"[ERROR] Role change failed: {ex.Message}");
+                return RedirectToAction("UserList");
+            }
+        }
+
+        /// <summary>
+        /// ユーザー有効/無効切り替え（管理者のみ）
+        /// </summary>
+        [HttpPost]
+        public async Task<IActionResult> ToggleActive(string employeeId)
+        {
+            // 管理者権限チェック
+            var currentRole = HttpContext.Session.GetString("Role");
+            if (currentRole != "admin")
+            {
+                TempData["Error"] = "管理者権限が必要です";
+                return RedirectToAction("Index", "Home");
+            }
+
+            // 自分自身は無効化できない
+            var currentEmployeeId = HttpContext.Session.GetString("EmployeeId");
+            if (employeeId == currentEmployeeId)
+            {
+                TempData["Error"] = "自分自身を無効化することはできません";
+                return RedirectToAction("UserList");
+            }
+
+            try
+            {
+                var employee = await _context.Employees
+                    .FirstOrDefaultAsync(e => e.EmployeeId == employeeId);
+
+                if (employee == null)
+                {
+                    TempData["Error"] = "ユーザーが見つかりません";
+                    return RedirectToAction("UserList");
+                }
+
+                employee.IsActive = !employee.IsActive;
+                await _context.SaveChangesAsync();
+
+                var status = employee.IsActive ? "有効" : "無効";
+                TempData["Success"] = $"{employee.Name}（{employeeId}）を「{status}」に変更しました";
+                Console.WriteLine($"[INFO] Active status changed: {employeeId} → {status}");
+
+                return RedirectToAction("UserList");
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = $"状態変更に失敗しました: {ex.Message}";
+                Console.WriteLine($"[ERROR] Active toggle failed: {ex.Message}");
+                return RedirectToAction("UserList");
+            }
+        }
     }
 }
