@@ -142,9 +142,12 @@ namespace ProjectOrderNumberSystem.Controllers
                                           boardProject.order_amount?.ToString() ??
                                           boardProject.total_amount?.ToString();
 
-                            if (!string.IsNullOrEmpty(amountStr) && decimal.TryParse(amountStr, out decimal amount))
+                            if (!string.IsNullOrEmpty(amountStr))
                             {
-                                project.Budget = amount;
+                                if (int.TryParse(amountStr, out int amountValue))
+                                {
+                                    project.Budget = amountValue;
+                                }
                             }
 
                             // Board project IDを保存（後で管理番号を更新するため）
