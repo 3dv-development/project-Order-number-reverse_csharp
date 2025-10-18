@@ -61,8 +61,8 @@ namespace ProjectOrderNumberSystem.Controllers
                             Name = p.name?.ToString() ?? "",
                             ClientName = p.client?.name?.ToString() ?? "",
                             OrderStatus = p.order_status_name?.ToString() ?? "",
-                            // 金額フィールドの候補をすべて試す
-                            Amount = p.amount?.ToString() ?? p.budget?.ToString() ?? p.price?.ToString() ?? p.order_amount?.ToString() ?? p.total_amount?.ToString() ?? ""
+                            // 見積り金額フィールドの候補をすべて試す
+                            Amount = p.estimate_amount?.ToString() ?? p.quotation_amount?.ToString() ?? p.estimated_amount?.ToString() ?? p.quote_amount?.ToString() ?? p.amount?.ToString() ?? p.budget?.ToString() ?? p.price?.ToString() ?? ""
                         })
                         .OrderByDescending(p => p.ProjectNo)
                         .ToList();
@@ -135,12 +135,14 @@ namespace ProjectOrderNumberSystem.Controllers
                                 project.ClientName = boardProject.client.name.ToString();
                             }
 
-                            // 金額を取得（複数のフィールド候補を試す）
-                            var amountStr = boardProject.amount?.ToString() ??
+                            // 見積り金額を取得（複数のフィールド候補を試す）
+                            var amountStr = boardProject.estimate_amount?.ToString() ??
+                                          boardProject.quotation_amount?.ToString() ??
+                                          boardProject.estimated_amount?.ToString() ??
+                                          boardProject.quote_amount?.ToString() ??
+                                          boardProject.amount?.ToString() ??
                                           boardProject.budget?.ToString() ??
-                                          boardProject.price?.ToString() ??
-                                          boardProject.order_amount?.ToString() ??
-                                          boardProject.total_amount?.ToString();
+                                          boardProject.price?.ToString();
 
                             if (!string.IsNullOrEmpty(amountStr))
                             {
@@ -386,8 +388,8 @@ namespace ProjectOrderNumberSystem.Controllers
                         ManagementNumber = p.management_number?.ToString(),
                         OrderStatus = p.order_status_name?.ToString(),
                         CreatedAt = p.created_at?.ToString(),
-                        // 金額フィールドの候補をすべて試す
-                        Amount = p.amount?.ToString() ?? p.budget?.ToString() ?? p.price?.ToString() ?? p.order_amount?.ToString() ?? p.total_amount?.ToString() ?? ""
+                        // 見積り金額フィールドの候補をすべて試す
+                        Amount = p.estimate_amount?.ToString() ?? p.quotation_amount?.ToString() ?? p.estimated_amount?.ToString() ?? p.quote_amount?.ToString() ?? p.amount?.ToString() ?? p.budget?.ToString() ?? p.price?.ToString() ?? ""
                     })
                     .ToList();
 

@@ -46,7 +46,7 @@
                 <small class="form-text text-muted">
                     @if (ViewBag.BoardProjects != null && ViewBag.BoardProjects.Count > 0)
                     {
-                        <span>Board案件を選択すると、案件No、案件名、客先名、金額が自動入力されます（@ViewBag.BoardProjects.Count 件）</span>
+                        <span>Board案件を選択すると、案件No、案件名、客先名、見積り金額が自動入力されます（@ViewBag.BoardProjects.Count 件）</span>
                     }
                     else
                     {
@@ -88,7 +88,7 @@
             </div>
 
             <div class="mb-3">
-                <label for="budget" class="form-label">費用（円） <span class="text-danger">*</span></label>
+                <label for="budget" class="form-label">見積り金額（円） <span class="text-danger">*</span></label>
                 <input type="number" class="form-control" id="budget" name="budget" value="0" required />
             </div>
 
