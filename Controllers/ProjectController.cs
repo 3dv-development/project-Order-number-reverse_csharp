@@ -104,13 +104,20 @@ namespace ProjectOrderNumberSystem.Controllers
 
             try
             {
+                // デバッグログ: 送信された担当者ID
+                Console.WriteLine($"[Debug] 送信されたStaffId: '{project.StaffId}'");
+
                 // 担当者情報を取得
                 var staff = await _context.Employees
                     .FirstOrDefaultAsync(e => e.EmployeeId == project.StaffId);
 
                 if (staff == null)
                 {
-                    return Json(new { error = "担当者が見つかりません" });
+                    // デバッグログ: データベースに存在する担当者ID一覧
+                    var allEmployees = await _context.Employees.Where(e => e.IsActive).ToListAsync();
+                    Console.WriteLine($"[Debug] データベース内の有効な担当者: {string.Join(", ", allEmployees.Select(e => $"'{e.EmployeeId}'"))}");
+
+                    return Json(new { error = $"担当者が見つかりません (送信されたID: '{project.StaffId}')" });
                 }
 
                 project.StaffName = staff.Name;
