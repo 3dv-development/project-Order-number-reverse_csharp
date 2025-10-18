@@ -56,6 +56,10 @@ namespace ProjectOrderNumberSystem.Services
                         var project = result[0];
                         _logger.LogInformation($"[BoardApi] 案件を発見: ID={project.id}, 案件名={project.name}");
 
+                        // 完全なプロジェクトデータをJSON形式でログ出力
+                        var projectJson = JsonConvert.SerializeObject(project, Formatting.Indented);
+                        _logger.LogInformation($"[BoardApi] プロジェクト完全データ:\n{projectJson}");
+
                         // 見積り金額フィールドの確認ログ
                         _logger.LogInformation($"[BoardApi] 金額フィールド確認 - estimate_amount={project.estimate_amount}, quotation_amount={project.quotation_amount}, amount={project.amount}, budget={project.budget}, price={project.price}");
 
