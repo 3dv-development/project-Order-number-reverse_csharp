@@ -79,9 +79,17 @@
                     <option value="">選択してください</option>
                     @if (employees != null)
                     {
+                        var currentEmployeeId = ViewData["EmployeeId"]?.ToString();
                         foreach (var emp in employees)
                         {
-                            <option value="@emp.EmployeeId">@emp.Name (@emp.EmployeeId)</option>
+                            if (emp.EmployeeId == currentEmployeeId)
+                            {
+                                <option value="@emp.EmployeeId" selected>@emp.Name (@emp.EmployeeId)</option>
+                            }
+                            else
+                            {
+                                <option value="@emp.EmployeeId">@emp.Name (@emp.EmployeeId)</option>
+                            }
                         }
                     }
                 </select>

@@ -53,8 +53,13 @@ namespace ProjectOrderNumberSystem.Services
 
                     if (result != null && result.Count > 0)
                     {
-                        _logger.LogInformation($"[BoardApi] 案件を発見: ID={result[0].id}, 案件名={result[0].name}");
-                        return result[0]; // 配列の最初の要素を返す
+                        var project = result[0];
+                        _logger.LogInformation($"[BoardApi] 案件を発見: ID={project.id}, 案件名={project.name}");
+
+                        // 見積り金額フィールドの確認ログ
+                        _logger.LogInformation($"[BoardApi] 金額フィールド確認 - estimate_amount={project.estimate_amount}, quotation_amount={project.quotation_amount}, amount={project.amount}, budget={project.budget}, price={project.price}");
+
+                        return project; // 配列の最初の要素を返す
                     }
 
                     _logger.LogWarning($"[BoardApi] 案件番号 {caseNumber} が見つかりません");
