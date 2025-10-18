@@ -136,13 +136,19 @@ namespace ProjectOrderNumberSystem.Controllers
                             }
 
                             // 見積り金額を取得（複数のフィールド候補を試す）
-                            var amountStr = boardProject.estimate_amount?.ToString() ??
-                                          boardProject.quotation_amount?.ToString() ??
+                            var amountStr = boardProject.quotation_amount?.ToString() ??
+                                          boardProject.estimate_amount?.ToString() ??
+                                          boardProject.order_amount?.ToString() ??
+                                          boardProject.sales_amount?.ToString() ??
+                                          boardProject.contract_amount?.ToString() ??
                                           boardProject.estimated_amount?.ToString() ??
                                           boardProject.quote_amount?.ToString() ??
                                           boardProject.amount?.ToString() ??
+                                          boardProject.total_amount?.ToString() ??
                                           boardProject.budget?.ToString() ??
                                           boardProject.price?.ToString();
+
+                            Console.WriteLine($"[Debug] 見積り金額取得試行 - quotation_amount={boardProject.quotation_amount}, order_amount={boardProject.order_amount}, sales_amount={boardProject.sales_amount}, amount={boardProject.amount}, 最終取得値={amountStr}");
 
                             if (!string.IsNullOrEmpty(amountStr))
                             {
