@@ -92,7 +92,7 @@ namespace ProjectOrderNumberSystem.Controllers
 
         // 採番実行
         [HttpPost]
-        public async Task<IActionResult> Create(Project project)
+        public async Task<IActionResult> Create([FromBody] Project project)
         {
             var employeeId = HttpContext.Session.GetString("EmployeeId");
             var employeeName = HttpContext.Session.GetString("EmployeeName");
@@ -106,6 +106,7 @@ namespace ProjectOrderNumberSystem.Controllers
             {
                 // デバッグログ: 送信された担当者ID
                 Console.WriteLine($"[Debug] 送信されたStaffId: '{project.StaffId}'");
+                Console.WriteLine($"[Debug] Project全体: Category={project.Category}, ProjectName={project.ProjectName}, ClientName={project.ClientName}, Budget={project.Budget}");
 
                 // 担当者情報を取得
                 var staff = await _context.Employees

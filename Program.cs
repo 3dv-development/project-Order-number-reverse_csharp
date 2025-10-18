@@ -30,7 +30,12 @@ else
 }
 
 // サービスの登録
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews()
+    .AddJsonOptions(options =>
+    {
+        // JSONのキャメルケース (staffId) をパスカルケース (StaffId) に自動変換
+        options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+    });
 
 // データベースコンテキストの登録
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
