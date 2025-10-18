@@ -136,7 +136,29 @@ namespace ProjectOrderNumberSystem.Controllers
             await _context.SaveChangesAsync();
 
             TempData["Success"] = $"アカウントを作成しました。社員番号: {employeeId}、初期パスワード: {employeeId}";
-            return RedirectToAction("Admin", "Home");
+            return RedirectToAction("UserList");
+        }
+
+        /// <summary>
+        /// ユーザー一覧画面（管理者のみ）
+        /// </summary>
+        [HttpGet]
+        public async Task<IActionResult> UserList()
+        {
+            // 管理者権限チェック
+            var role = HttpContext.Session.GetString("Role");
+            if (role != "admin")
+            {
+                TempData["Error"] = "管理者権限が必要です";
+                return RedirectToAction("Index", "Home");
+            }
+
+            // 全ユーザーを取得（社員番号順）
+            var users = await _context.Employees
+                .OrderBy(e => e.EmployeeId)
+                .ToListAsync();
+
+            return View(users);
         }
     }
 }

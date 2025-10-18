@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using ProjectOrderNumberSystem.Data;
 using ProjectOrderNumberSystem.Models;
 using ProjectOrderNumberSystem.Services;
+using System.Text;
 
 namespace ProjectOrderNumberSystem.Controllers
 {
@@ -381,6 +382,101 @@ namespace ProjectOrderNumberSystem.Controllers
                 TempData["Error"] = $"削除に失敗しました: {ex.Message}";
                 return RedirectToAction("Detail", new { projectNumber });
             }
+        }
+
+        // CSV出力（管理者のみ）
+        [HttpGet]
+        public async Task<IActionResult> ExportCsv(string? category, string? keyword)
+        {
+            var employeeId = HttpContext.Session.GetString("EmployeeId");
+            if (string.IsNullOrEmpty(employeeId))
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            // 管理者権限チェック
+            var role = HttpContext.Session.GetString("Role");
+            if (role != "admin")
+            {
+                TempData["Error"] = "CSV出力は管理者のみ使用できます";
+                return RedirectToAction("Search");
+            }
+
+            try
+            {
+                // 検索条件に基づいてプロジェクトを取得
+                var projects = await _projectService.GetProjectsAsync(category, keyword);
+
+                // CSV生成（Shift-JIS形式）
+                var csv = new StringBuilder();
+
+                // ヘッダー行
+                csv.AppendLine("受注番号,カテゴリ,案件No,案件名,客先名,担当者,予算,納期,備考,登録日時,更新日時");
+
+                // データ行
+                foreach (var project in projects)
+                {
+                    var categoryName = project.Category switch
+                    {
+                        "01" => "施工",
+                        "02" => "設計",
+                        "03" => "検査",
+                        "04" => "その他",
+                        _ => project.Category
+                    };
+
+                    csv.AppendLine(string.Join(",",
+                        EscapeCsvField(project.ProjectNumber),
+                        EscapeCsvField(categoryName),
+                        EscapeCsvField(project.CaseNumber ?? ""),
+                        EscapeCsvField(project.ProjectName),
+                        EscapeCsvField(project.ClientName),
+                        EscapeCsvField(project.StaffName),
+                        EscapeCsvField(project.Budget.ToString()),
+                        EscapeCsvField(project.Deadline.ToString("yyyy-MM-dd")),
+                        EscapeCsvField(project.Remarks ?? ""),
+                        EscapeCsvField(project.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss")),
+                        EscapeCsvField(project.UpdatedAt.ToString("yyyy-MM-dd HH:mm:ss"))
+                    ));
+                }
+
+                // Shift-JIS エンコーディング
+                Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+                var sjisEncoding = Encoding.GetEncoding("Shift_JIS");
+                var csvBytes = sjisEncoding.GetBytes(csv.ToString());
+
+                // ファイル名生成（タイムスタンプ付き）
+                var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+                var filename = $"projects_{timestamp}.csv";
+
+                return File(csvBytes, "text/csv", filename);
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = $"CSV出力に失敗しました: {ex.Message}";
+                return RedirectToAction("Search", new { category, keyword });
+            }
+        }
+
+        /// <summary>
+        /// CSVフィールドのエスケープ処理
+        /// </summary>
+        private string EscapeCsvField(string field)
+        {
+            if (string.IsNullOrEmpty(field))
+            {
+                return "";
+            }
+
+            // カンマ、ダブルクォート、改行が含まれる場合はダブルクォートで囲む
+            if (field.Contains(",") || field.Contains("\"") || field.Contains("\n") || field.Contains("\r"))
+            {
+                // ダブルクォートを2つに置換
+                field = field.Replace("\"", "\"\"");
+                return $"\"{field}\"";
+            }
+
+            return field;
         }
 
         // Board連携テスト - 管理番号が空の案件一覧

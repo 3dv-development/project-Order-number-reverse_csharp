@@ -1,9 +1,21 @@
 @model List<ProjectOrderNumberSystem.Models.Project>
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
 @{
     ViewData["Title"] = "案件検索";
+    var employeeRole = HttpContextAccessor.HttpContext?.Session.GetString("Role");
+    var isAdmin = employeeRole == "admin";
 }
 
-<h2>案件検索</h2>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>案件検索</h2>
+    @if (isAdmin && Model != null && Model.Any())
+    {
+        <a href="/Project/ExportCsv?category=@ViewData["Category"]&keyword=@ViewData["Keyword"]"
+           class="btn btn-success">
+            <i class="bi bi-download"></i> CSV出力
+        </a>
+    }
+</div>
 
 <form method="get" asp-action="Search" class="row g-3 mb-4">
     <div class="col-md-3">
