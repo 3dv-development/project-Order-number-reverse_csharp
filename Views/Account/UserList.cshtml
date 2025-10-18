@@ -78,9 +78,12 @@
                                     }
                                 </td>
                                 <td>
-                                    @if (!isSelf)
-                                    {
-                                        <div class="btn-group btn-group-sm" role="group">
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <a href="/Account/EditUser?employeeId=@user.EmployeeId" class="btn btn-info">
+                                            編集
+                                        </a>
+                                        @if (!isSelf)
+                                        {
                                             @if (user.Role == "user")
                                             {
                                                 <button type="button" class="btn btn-warning" onclick="changeRole('@user.EmployeeId', 'admin', '@user.Name')">
@@ -96,12 +99,8 @@
                                             <button type="button" class="btn @(user.IsActive ? "btn-outline-danger" : "btn-outline-success")" onclick="toggleActive('@user.EmployeeId', '@user.Name', @user.IsActive.ToString().ToLower())">
                                                 @(user.IsActive ? "無効化" : "有効化")
                                             </button>
-                                        </div>
-                                    }
-                                    else
-                                    {
-                                        <span class="text-muted">-</span>
-                                    }
+                                        }
+                                    </div>
                                 </td>
                             </tr>
                         }

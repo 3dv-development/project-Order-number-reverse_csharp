@@ -268,5 +268,86 @@ namespace ProjectOrderNumberSystem.Controllers
                 return RedirectToAction("UserList");
             }
         }
+
+        /// <summary>
+        /// ユーザー編集画面表示（管理者のみ）
+        /// </summary>
+        [HttpGet]
+        public async Task<IActionResult> EditUser(string employeeId)
+        {
+            // 管理者権限チェック
+            var role = HttpContext.Session.GetString("Role");
+            if (role != "admin")
+            {
+                TempData["Error"] = "管理者権限が必要です";
+                return RedirectToAction("Index", "Home");
+            }
+
+            var employee = await _context.Employees
+                .FirstOrDefaultAsync(e => e.EmployeeId == employeeId);
+
+            if (employee == null)
+            {
+                TempData["Error"] = "ユーザーが見つかりません";
+                return RedirectToAction("UserList");
+            }
+
+            return View(employee);
+        }
+
+        /// <summary>
+        /// ユーザー情報更新（管理者のみ）
+        /// </summary>
+        [HttpPost]
+        public async Task<IActionResult> EditUser(string employeeId, string name, string? email)
+        {
+            // 管理者権限チェック
+            var role = HttpContext.Session.GetString("Role");
+            if (role != "admin")
+            {
+                TempData["Error"] = "管理者権限が必要です";
+                return RedirectToAction("Index", "Home");
+            }
+
+            if (string.IsNullOrEmpty(name))
+            {
+                TempData["Error"] = "氏名は必須です";
+                return RedirectToAction("EditUser", new { employeeId });
+            }
+
+            try
+            {
+                var employee = await _context.Employees
+                    .FirstOrDefaultAsync(e => e.EmployeeId == employeeId);
+
+                if (employee == null)
+                {
+                    TempData["Error"] = "ユーザーが見つかりません";
+                    return RedirectToAction("UserList");
+                }
+
+                employee.Name = name;
+                employee.Email = email;
+                await _context.SaveChangesAsync();
+
+                TempData["Success"] = $"{employee.Name}（{employeeId}）の情報を更新しました";
+                Console.WriteLine($"[INFO] User info updated: {employeeId}");
+
+                // 自分自身を編集した場合、セッション情報も更新
+                var currentEmployeeId = HttpContext.Session.GetString("EmployeeId");
+                if (employeeId == currentEmployeeId)
+                {
+                    HttpContext.Session.SetString("EmployeeName", name);
+                }
+
+                return RedirectToAction("UserList");
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = $"更新に失敗しました: {ex.Message}";
+                Console.WriteLine($"[ERROR] User update failed: {ex.Message}");
+                return RedirectToAction("EditUser", new { employeeId });
+            }
+        }
     }
 }
