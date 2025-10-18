@@ -1,0 +1,54 @@
+@{
+    ViewData["Title"] = "新規アカウント登録";
+}
+
+<h2>新規アカウント登録</h2>
+<p class="text-muted">管理者のみ新規アカウントを登録できます</p>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+
+<div class="card">
+    <div class="card-body">
+        <form method="post" asp-action="Register">
+            <div class="mb-3">
+                <label for="employeeId" class="form-label">社員番号 <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="employeeId" name="employeeId" required placeholder="例: 1001">
+                <div class="form-text">この社員番号が初期パスワードになります</div>
+            </div>
+
+            <div class="mb-3">
+                <label for="name" class="form-label">氏名 <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="name" name="name" required placeholder="例: 山田太郎">
+            </div>
+
+            <div class="mb-3">
+                <label for="email" class="form-label">メールアドレス</label>
+                <input type="email" class="form-control" id="email" name="email" placeholder="例: yamada@example.com">
+                <div class="form-text">任意項目です</div>
+            </div>
+
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-primary">登録</button>
+                <a href="/" class="btn btn-secondary">戻る</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="mt-4">
+    <h4>注意事項</h4>
+    <ul>
+        <li>登録したアカウントの初期パスワードは社員番号と同じです</li>
+        <li>初回ログイン後、パスワードを変更することを推奨します</li>
+        <li>新規アカウントの権限は「一般ユーザー」として登録されます</li>
+        <li>管理者権限が必要な場合は、データベースで直接変更してください</li>
+    </ul>
+</div>

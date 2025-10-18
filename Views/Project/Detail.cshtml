@@ -1,0 +1,121 @@
+@model ProjectOrderNumberSystem.Models.Project
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@{
+    ViewData["Title"] = "案件詳細";
+    var employeeRole = HttpContextAccessor.HttpContext?.Session.GetString("Role");
+    var isAdmin = employeeRole == "admin";
+}
+
+<h2>案件詳細</h2>
+
+<div class="card">
+    <div class="card-header">
+        <h4>受注番号: @Model.ProjectNumber</h4>
+    </div>
+    <div class="card-body">
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <dl class="row">
+                    <dt class="col-sm-4">カテゴリ</dt>
+                    <dd class="col-sm-8">@Model.GetCategoryName() (@Model.Category)</dd>
+
+                    <dt class="col-sm-4">案件No</dt>
+                    <dd class="col-sm-8">@(string.IsNullOrEmpty(Model.CaseNumber) ? "―" : Model.CaseNumber)</dd>
+
+                    <dt class="col-sm-4">案件名</dt>
+                    <dd class="col-sm-8">@Model.ProjectName</dd>
+
+                    <dt class="col-sm-4">客先名</dt>
+                    <dd class="col-sm-8">@Model.ClientName</dd>
+                </dl>
+            </div>
+            <div class="col-md-6">
+                <dl class="row">
+                    <dt class="col-sm-4">担当者</dt>
+                    <dd class="col-sm-8">@Model.StaffName (@Model.StaffId)</dd>
+
+                    <dt class="col-sm-4">費用</dt>
+                    <dd class="col-sm-8">¥@Model.Budget.ToString("N0")</dd>
+
+                    <dt class="col-sm-4">納期</dt>
+                    <dd class="col-sm-8">@Model.Deadline.ToString("yyyy年MM月dd日")</dd>
+
+                    <dt class="col-sm-4">登録日時</dt>
+                    <dd class="col-sm-8">@Model.CreatedAt.ToLocalTime().ToString("yyyy/MM/dd HH:mm")</dd>
+                </dl>
+            </div>
+        </div>
+
+        @if (!string.IsNullOrEmpty(Model.Remarks))
+        {
+            <div class="row">
+                <div class="col-12">
+                    <dt>備考</dt>
+                    <dd class="border p-3 bg-light">@Model.Remarks</dd>
+                </div>
+            </div>
+        }
+
+        <div class="mt-4">
+            <a href="/Project/Search" class="btn btn-secondary">検索に戻る</a>
+            <a href="/Project/Edit?projectNumber=@Model.ProjectNumber" class="btn btn-warning">編集</a>
+
+            @if (isAdmin)
+            {
+                <button type="button" class="btn btn-danger" onclick="confirmDelete('@Model.ProjectNumber', '@Model.ProjectName')">削除</button>
+            }
+        </div>
+    </div>
+</div>
+
+@if (Model.EditHistory != null && Model.EditHistory.Any())
+{
+    <div class="card mt-4">
+        <div class="card-header">
+            <h5>編集履歴</h5>
+        </div>
+        <div class="card-body">
+            <table class="table table-sm">
+                <thead>
+                    <tr>
+                        <th>日時</th>
+                        <th>編集者</th>
+                        <th>操作</th>
+                        <th>変更内容</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var history in Model.EditHistory.OrderByDescending(h => h.EditedAt))
+                    {
+                        <tr>
+                            <td>@history.EditedAt.ToLocalTime().ToString("yyyy/MM/dd HH:mm")</td>
+                            <td>@history.EditorName (@history.EditorId)</td>
+                            <td>@(history.EditType == "create" ? "新規作成" : "更新")</td>
+                            <td>@history.Changes</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+
+<script>
+function confirmDelete(projectNumber, projectName) {
+    if (confirm(`案件「${projectName}」（受注番号: ${projectNumber}）を削除してもよろしいですか？\n\nこの操作は取り消せません。`)) {
+        // フォームを動的に作成して送信
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/Project/Delete';
+
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'projectNumber';
+        input.value = projectNumber;
+
+        form.appendChild(input);
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+</script>

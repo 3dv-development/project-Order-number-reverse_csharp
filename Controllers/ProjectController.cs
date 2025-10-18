@@ -352,7 +352,7 @@ namespace ProjectOrderNumberSystem.Controllers
             }
         }
 
-        // 削除
+        // 削除（管理者のみ）
         [HttpPost]
         public async Task<IActionResult> Delete(string projectNumber)
         {
@@ -360,6 +360,14 @@ namespace ProjectOrderNumberSystem.Controllers
             if (string.IsNullOrEmpty(employeeId))
             {
                 return RedirectToAction("Login", "Account");
+            }
+
+            // 管理者権限チェック
+            var role = HttpContext.Session.GetString("Role");
+            if (role != "admin")
+            {
+                TempData["Error"] = "削除機能は管理者のみ使用できます";
+                return RedirectToAction("Detail", new { projectNumber });
             }
 
             try

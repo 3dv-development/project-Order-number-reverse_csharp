@@ -59,6 +59,9 @@ builder.Services.AddSession(options =>
 // HttpClientの登録（Board API用）
 builder.Services.AddHttpClient();
 
+// HttpContextAccessorの登録（Razorビューでセッションにアクセスするため）
+builder.Services.AddHttpContextAccessor();
+
 // カスタムサービスの登録
 builder.Services.AddScoped<IProjectService, ProjectService>();
 // メール機能は一時的に無効化（設定未確定のため）
