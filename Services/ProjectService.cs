@@ -19,7 +19,7 @@ namespace ProjectOrderNumberSystem.Services
         /// </summary>
         public async Task<string> GenerateProjectNumberAsync(string category)
         {
-            var currentYear = DateTime.Now.Year % 100; // 西暦下2桁
+            var currentYear = DateTime.UtcNow.Year % 100; // 西暦下2桁
             var yearPrefix = $"{currentYear:D2}{category}";
 
             // 同じ年・カテゴリの最大連番を取得
@@ -55,8 +55,18 @@ namespace ProjectOrderNumberSystem.Services
         {
             // 受注番号を生成
             project.ProjectNumber = await GenerateProjectNumberAsync(project.Category);
-            project.CreatedAt = DateTime.Now;
-            project.UpdatedAt = DateTime.Now;
+            project.CreatedAt = DateTime.UtcNow;
+            project.UpdatedAt = DateTime.UtcNow;
+
+            // Deadlineフィールドをローカル時刻からUTCに変換（Kindが指定されていない場合）
+            if (project.Deadline.Kind == DateTimeKind.Unspecified)
+            {
+                project.Deadline = DateTime.SpecifyKind(project.Deadline, DateTimeKind.Utc);
+            }
+            else if (project.Deadline.Kind == DateTimeKind.Local)
+            {
+                project.Deadline = project.Deadline.ToUniversalTime();
+            }
 
             _context.Projects.Add(project);
 
@@ -68,7 +78,7 @@ namespace ProjectOrderNumberSystem.Services
                 EditorName = editorName,
                 EditType = "create",
                 Changes = JsonConvert.SerializeObject(new { action = "新規作成" }),
-                EditedAt = DateTime.Now
+                EditedAt = DateTime.UtcNow
             };
 
             _context.EditHistories.Add(history);
@@ -83,7 +93,7 @@ namespace ProjectOrderNumberSystem.Services
         /// </summary>
         public async Task<Project> UpdateProjectAsync(Project project, string editorId, string editorName, Dictionary<string, object> changes)
         {
-            project.UpdatedAt = DateTime.Now;
+            project.UpdatedAt = DateTime.UtcNow;
             _context.Projects.Update(project);
 
             // 編集履歴を追加
@@ -96,7 +106,7 @@ namespace ProjectOrderNumberSystem.Services
                     EditorName = editorName,
                     EditType = "update",
                     Changes = JsonConvert.SerializeObject(changes),
-                    EditedAt = DateTime.Now
+                    EditedAt = DateTime.UtcNow
                 };
 
                 _context.EditHistories.Add(history);

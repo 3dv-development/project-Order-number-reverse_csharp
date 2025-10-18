@@ -36,7 +36,7 @@ namespace ProjectOrderNumberSystem.Models
         public string? Changes { get; set; } // JSON形式
 
         [Column("edited_at")]
-        public DateTime EditedAt { get; set; } = DateTime.Now;
+        public DateTime EditedAt { get; set; } = DateTime.UtcNow;
 
         // リレーション
         [ForeignKey("ProjectId")]
