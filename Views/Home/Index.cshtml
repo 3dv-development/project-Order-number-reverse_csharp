@@ -31,11 +31,16 @@
     @if (Context.Session.GetString("Role") == "admin")
     {
         <div class="col-md-4 mb-3">
-            <div class="card">
+            <div class="card border-warning">
                 <div class="card-body">
-                    <h5 class="card-title">管理者メニュー</h5>
-                    <p class="card-text">アカウント管理などの管理者機能</p>
-                    <a href="/Account/Register" class="btn btn-warning">管理画面</a>
+                    <h5 class="card-title text-warning">
+                        <i class="bi bi-shield-lock"></i> 管理者メニュー
+                    </h5>
+                    <p class="card-text">ユーザーアカウント管理機能</p>
+                    <div class="d-grid gap-2">
+                        <a href="/Account/UserList" class="btn btn-warning">ユーザー一覧</a>
+                        <a href="/Account/Register" class="btn btn-outline-warning">新規ユーザー登録</a>
+                    </div>
                 </div>
             </div>
         </div>
