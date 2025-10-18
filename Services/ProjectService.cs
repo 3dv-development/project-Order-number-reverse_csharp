@@ -155,15 +155,22 @@ namespace ProjectOrderNumberSystem.Services
         }
 
         /// <summary>
-        /// プロジェクトを削除
+        /// プロジェクトを削除（編集履歴も一緒に削除）
         /// </summary>
         public async Task DeleteProjectAsync(string projectNumber)
         {
             var project = await _context.Projects
+                .Include(p => p.EditHistory)
                 .FirstOrDefaultAsync(p => p.ProjectNumber == projectNumber);
 
             if (project != null)
             {
+                // 外部キー制約エラーを防ぐため、先に編集履歴を削除
+                if (project.EditHistory != null && project.EditHistory.Any())
+                {
+                    _context.EditHistories.RemoveRange(project.EditHistory);
+                }
+
                 _context.Projects.Remove(project);
                 await _context.SaveChangesAsync();
             }
