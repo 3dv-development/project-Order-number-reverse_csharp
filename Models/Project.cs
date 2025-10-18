@@ -59,10 +59,10 @@ namespace ProjectOrderNumberSystem.Models
         public string? Remarks { get; set; }
 
         [Column("created_at")]
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         [Column("updated_at")]
-        public DateTime UpdatedAt { get; set; } = DateTime.Now;
+        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
         // リレーション
         public virtual ICollection<EditHistory> EditHistory { get; set; } = new List<EditHistory>();
