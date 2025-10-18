@@ -120,6 +120,23 @@
 
 @section Scripts {
 <script>
+// ページ読み込み時に担当者のデフォルト値を設定
+document.addEventListener('DOMContentLoaded', function() {
+    const staffIdSelect = document.getElementById('staffId');
+    const currentEmployeeId = '@ViewData["EmployeeId"]';
+
+    console.log('[Init] Current employee ID from session:', currentEmployeeId);
+    console.log('[Init] StaffId select value after load:', staffIdSelect.value);
+
+    // selected属性が正しく設定されているか確認し、なければJavaScriptで設定
+    if (!staffIdSelect.value || staffIdSelect.value === '') {
+        if (currentEmployeeId) {
+            staffIdSelect.value = currentEmployeeId;
+            console.log('[Init] Set staffId to:', currentEmployeeId);
+        }
+    }
+});
+
 // Board案件選択時の自動入力
 document.getElementById('boardProject').addEventListener('change', function() {
     const selectedOption = this.options[this.selectedIndex];
@@ -130,6 +147,8 @@ document.getElementById('boardProject').addEventListener('change', function() {
         const projectName = selectedOption.getAttribute('data-name');
         const clientName = selectedOption.getAttribute('data-client');
         const amount = selectedOption.getAttribute('data-amount');
+
+        console.log('[Board] Selected project:', projectNo, projectName, amount);
 
         // 各フィールドに自動入力
         document.getElementById('caseNumber').value = projectNo;
@@ -165,16 +184,30 @@ document.getElementById('boardProject').addEventListener('change', function() {
 document.getElementById('createForm').addEventListener('submit', async function(e) {
     e.preventDefault();
 
+    const staffIdElement = document.getElementById('staffId');
+    const staffIdValue = staffIdElement.value;
+
+    console.log('[Submit] StaffId value:', staffIdValue);
+    console.log('[Submit] StaffId selectedIndex:', staffIdElement.selectedIndex);
+
+    // 担当者が選択されていない場合はエラー
+    if (!staffIdValue || staffIdValue === '') {
+        alert('担当者を選択してください');
+        return;
+    }
+
     const formData = {
         category: document.getElementById('category').value,
         caseNumber: document.getElementById('caseNumber').value,
         projectName: document.getElementById('projectName').value,
         clientName: document.getElementById('clientName').value,
-        staffId: document.getElementById('staffId').value,
+        staffId: staffIdValue,
         budget: parseInt(document.getElementById('budget').value),
         deadline: document.getElementById('deadline').value,
         remarks: document.getElementById('remarks').value
     };
+
+    console.log('[Submit] Sending formData:', formData);
 
     try {
         const response = await fetch('/Project/Create', {
