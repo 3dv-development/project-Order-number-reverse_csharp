@@ -1,8 +1,10 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.HttpOverrides;
 using ProjectOrderNumberSystem.Data;
 using ProjectOrderNumberSystem.Models;
 using ProjectOrderNumberSystem.Services;
 using ProjectOrderNumberSystem.Middleware;
+using System.Net;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,6 +31,15 @@ else
 {
     Console.WriteLine($"[INFO] Using connection string format: {(connectionString.Contains("Host=") ? "Npgsql" : "Unknown")}");
 }
+
+// ForwardedHeadersの設定（リバースプロキシ環境対応）
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    // すべてのプロキシを信頼（Render環境用）
+    options.KnownNetworks.Clear();
+    options.KnownProxies.Clear();
+});
 
 // サービスの登録
 builder.Services.AddControllersWithViews()
@@ -142,6 +153,10 @@ using (var scope = app.Services.CreateScope())
 }
 
 // HTTPリクエストパイプラインの設定
+
+// ForwardedHeadersミドルウェアを最初に配置（重要！）
+app.UseForwardedHeaders();
+
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
