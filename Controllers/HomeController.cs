@@ -26,5 +26,20 @@ namespace ProjectOrderNumberSystem.Controllers
 
             return View();
         }
+
+        /// <summary>
+        /// ヘルスチェック用エンドポイント（IP制限除外）
+        /// 外部監視サービスからの定期アクセス用
+        /// </summary>
+        [HttpGet]
+        public IActionResult Health()
+        {
+            return Ok(new
+            {
+                status = "healthy",
+                timestamp = DateTime.UtcNow,
+                service = "ProjectOrderNumberSystem"
+            });
+        }
     }
 }

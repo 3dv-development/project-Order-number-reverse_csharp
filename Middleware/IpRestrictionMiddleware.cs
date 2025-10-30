@@ -27,6 +27,14 @@ namespace ProjectOrderNumberSystem.Middleware
 
         public async Task InvokeAsync(HttpContext context)
         {
+            // ヘルスチェックエンドポイントはIP制限を除外
+            if (context.Request.Path.StartsWithSegments("/Home/Health", StringComparison.OrdinalIgnoreCase))
+            {
+                _logger.LogInformation("ヘルスチェックエンドポイントへのアクセス（IP制限スキップ）");
+                await _next(context);
+                return;
+            }
+
             // IP制限が有効かどうかを確認
             var ipRestrictionEnabled = _configuration.GetValue<bool>("IpRestriction:Enabled", true);
 
