@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using ProjectOrderNumberSystem.Data;
 using ProjectOrderNumberSystem.Models;
 using ProjectOrderNumberSystem.Services;
+using ProjectOrderNumberSystem.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -149,6 +150,9 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+
+// IP制限ミドルウェアを追加（静的ファイルの後、ルーティングの前）
+app.UseIpRestriction();
 
 app.UseRouting();
 
